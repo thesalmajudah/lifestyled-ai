@@ -5,6 +5,7 @@ import os
 
 import streamlit as st
 from dotenv import load_dotenv
+from groq import Groq
 
 import sys
 
@@ -315,6 +316,43 @@ def llm_advice_error_message(error_text: str, context: str) -> str:
         return "LLM stylist advice is temporarily unreachable due to a network/provider issue. Please retry."
     return f"LLM stylist advice is temporarily unavailable for {context}."
 
+
+def generate_runtime_style_advice(query: str, profile: UserProfile, items=None) -> str:
+    api_key = os.getenv("GROQ_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("GROQ_API_KEY is not set")
+
+    model = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+    item_text = ""
+    if items:
+        top = [f"{it.title} ({it.category}, ${it.price:.2f})" for it in items[:5]]
+        item_text = "Matched items: " + "; ".join(top)
+
+    prompt = (
+        "You are a personal stylist giving practical outfit advice. "
+        "Provide one short recommendation sentence, then 3 bullets, then 1 optional swap. "
+        "Be concise and grounded in the user profile. "
+        f"Query: {query}\n"
+        f"Style tags: {profile.style_tags}\n"
+        f"Lifestyle tags: {profile.lifestyle_tags}\n"
+        f"Climate tags: {profile.climate_tags}\n"
+        f"Occasion tags: {profile.occasion_tags}\n"
+        f"Budget: {profile.budget_min}-{profile.budget_max}\n"
+        f"Size: {profile.size}\n"
+        f"{item_text}"
+    )
+
+    client = Groq(api_key=api_key)
+    completion = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": "Be concise, practical, and fashion-aware."},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.6,
+    )
+    return (completion.choices[0].message.content or "").strip()
+
 with st.sidebar:
     st.header("Your Profile")
     style_tags = st.multiselect(
@@ -452,23 +490,23 @@ def run_recommendations(
             elif generate_style_advice is not None:
                 st.session_state.last_match_advice = generate_style_advice(query=query, profile=profile)
             else:
-                st.session_state.last_match_advice_error = "LLM advice helpers are unavailable in this deployment version."
+                st.session_state.last_match_advice = generate_runtime_style_advice(query=query, profile=profile, items=run_results)
         except Exception as exc:
             # Fall back to a simpler LLM advice prompt if matched-item advice fails.
-            if generate_style_advice is not None:
-                try:
+            try:
+                if generate_style_advice is not None:
                     st.session_state.last_match_advice = generate_style_advice(query=query, profile=profile)
-                    st.session_state.last_match_advice_error = ""
-                except Exception as fallback_exc:
-                    st.session_state.last_match_advice_error = str(fallback_exc)
-            else:
-                st.session_state.last_match_advice_error = str(exc)
+                else:
+                    st.session_state.last_match_advice = generate_runtime_style_advice(query=query, profile=profile, items=run_results)
+                st.session_state.last_match_advice_error = ""
+            except Exception as fallback_exc:
+                st.session_state.last_match_advice_error = str(fallback_exc or exc)
     else:
         try:
             if generate_style_advice is not None:
                 st.session_state.last_no_match_advice = generate_style_advice(query=query, profile=profile)
             else:
-                st.session_state.last_no_match_advice_error = "LLM advice helpers are unavailable in this deployment version."
+                st.session_state.last_no_match_advice = generate_runtime_style_advice(query=query, profile=profile)
         except Exception as exc:
             st.session_state.last_no_match_advice_error = str(exc)
 
