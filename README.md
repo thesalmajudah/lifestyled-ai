@@ -2,7 +2,7 @@
 
 **Capstone project for the [DataTalks.Club LLM Zoomcamp](https://github.com/DataTalksClub/llm-zoomcamp).**
 
-**An end-to-end production-style RAG application for personalized fashion recommendations based on user style, lifestyle, climate, budget, size, and occasion.**
+**An end-to-end production-style RAG application for personalized fashion recommendations based on user style, lifestyle, climate, budget, and occasion, with LLM stylist advice.**
 
 **Live App:** https://lifestyled-ai.streamlit.app
 
@@ -53,6 +53,8 @@ LifeStyled is a profile-aware fashion assistant that retrieves relevant products
 - Profile-aware retrieval with vector and hybrid search
 - Optional query rewrite + diversity rerank loop
 - Streamlit app with a simplified end-user recommendation flow and feedback logging
+- LLM-generated stylist advice for both matched and no-match queries
+- Size filtering is optional (improves recall when size is not selected)
 - Monitoring dashboard page with core charts and query table
 - Retrieval and prompt evaluation scripts
 
@@ -68,9 +70,9 @@ Recommended short walkthrough (60-120 seconds):
 ## Step-by-Step Implementation Path
 
 1. Build index from catalog
-2. Run hybrid retrieval
-3. Rank results with profile signals
-4. Add optional explanation layer
+2. Run default hybrid retrieval
+3. Rank results with profile signals and optional size filtering
+4. Add LLM stylist advice and optional per-item explanations
 5. Log events and monitor trends
 
 ## System Architecture & Workflow
@@ -87,16 +89,16 @@ flowchart TD
 	E --> G[Candidate Merge]
 	F --> G
 
-	G --> H[Hard Filters<br/>Budget, Size, Stock]
+	G --> H[Hard Filters<br/>Budget, Stock, Optional Size]
 	H --> I[Profile-Aware Ranking<br/>Style + Lifestyle + Climate + Occasion + Price Fit]
 	I --> J[Top-K Recommendations]
 
-	J --> K{LLM Explanations Enabled?}
-	K -- No --> L[Show Retrieval Reasons]
-	K -- Yes --> M[Groq Explanation Generation<br/>Prompt A default, Prompt B optional]
-	M --> N[Show LLM Explanation + Retrieval Reasons]
+	J --> K[LLM Stylist Advice<br/>Matched and No-Match Fallback]
+	K --> L{Per-item LLM Explanations Enabled?}
+	L -- No --> M[Show Retrieval Reasons]
+	L -- Yes --> N[Show LLM Explanation + Retrieval Reasons]
 
-	L --> O[User Feedback +1/-1]
+	M --> O[User Feedback +1/-1]
 	N --> O
 
 	O --> P[Log Events JSONL<br/>Query, Profile, Result IDs, Latency, Feedback]
@@ -112,6 +114,7 @@ flowchart TD
 
 ```text
 .
+├── .devcontainer/
 ├── app/
 │   ├── streamlit_app.py
 │   └── pages/
@@ -142,10 +145,15 @@ flowchart TD
 │       ├── ingestion.py
 │       ├── models.py
 │       └── retrieval.py
+├── src/
+│   └── lifestyled_ai/
+│       └── __init__.py
 ├── .env.example
 ├── Dockerfile
 ├── docker-compose.yml
+├── project.md
 ├── pyproject.toml
+├── requirements.txt
 ├── uv.lock
 └── README.md
 ```
@@ -162,7 +170,7 @@ Dataset compliance:
 
 1. Build vectors and lexical index from product catalog.
 2. Retrieve candidates from vector and BM25 search.
-3. Filter by budget, size, and stock.
+3. Filter by budget and stock, and by size only if the user selected a size.
 4. Re-rank by profile fit.
 5. Return top recommendations with reasons.
 
@@ -170,6 +178,8 @@ Runtime defaults used in the app are selected from offline experiments:
 
 - Retrieval mode shown to end users: `hybrid` (default in production UI)
 - Explanation style shown to end users: internal default selected via prompt-variant evaluation
+- Agentic rewrite/rerank loop: enabled by default in production UI
+- Per-item explanation generation: disabled by default to reduce latency and API usage
 
 The `Search mode` and prompt-variant controls are evaluation/tuning knobs and are not presented as end-user controls in the primary UI.
 
@@ -255,6 +265,8 @@ Dashboard sections:
 - Budget band distribution
 - Optional diagnostics
 - Table for queries
+
+Note: The monitoring page also tracks whether agentic retrieval and LLM explanations were enabled for each interaction.
 
 ## Reproducibility
 
