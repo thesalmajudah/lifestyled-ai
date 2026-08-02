@@ -1,0 +1,21 @@
+product_id,title,category,brand,price,colors,sizes,style_tags,lifestyle_tags,climate_tags,occasion_tags,description,stock_status
+P001,Everyday Linen Shirt,top,North Thread,49.99,beige|white|olive,S|M|L|XL,minimal|casual,office|remote-work,warm|mild,casual|work,"Breathable linen blend shirt for daily wear and warm commutes.",in_stock
+P002,Tailored Stretch Chino,bottom,North Thread,69.00,navy|khaki,30|32|34|36,smart-casual|minimal,office|travel,mild|warm,work|dinner,"Clean-cut chino with four-way stretch and wrinkle resistance.",in_stock
+P003,Waterproof City Trench,outerwear,Urban Form,139.00,black|stone,S|M|L|minimal|classic,commute|office,rainy|cold,work|formal,"Lightweight waterproof trench with removable belt.",in_stock
+P004,Performance Jogger,bottom,MoveWell,58.50,black|charcoal,S|M|L|XL,athleisure|sport,gym|errands,mild|warm,casual|active,"Moisture-wicking jogger with tapered ankle.",in_stock
+P005,Merino Crew Sweater,top,Fjord Loom,95.00,navy|camel,S|M|L|XL,classic|minimal,office|weekend,cold|mild,work|casual,"Soft merino crew neck that layers without bulk.",in_stock
+P006,Travel Capsule Blazer,outerwear,Axis Studio,149.00,navy|black,S|M|L,smart-casual|classic,business-travel|office,mild|cool,work|dinner,"Unstructured blazer with hidden zip pocket and stretch lining.",in_stock
+P007,Relaxed Denim Jacket,outerwear,Blue Peak,88.00,indigo|light-wash,S|M|L|XL,casual|street,weekend|travel,mild|cool,casual,"Classic denim jacket with relaxed fit and contrast stitching.",in_stock
+P008,Cotton Poplin Midi Dress,dress,Luna Vale,79.00,blue|white,XS|S|M|L,minimal|feminine,office|weekend,warm|mild,work|brunch,"Crisp poplin midi dress with pockets and tie waist.",in_stock
+P009,Recycled Puffer Vest,outerwear,EverField,92.00,black|forest,S|M|L|XL,casual|outdoor,travel|weekend,cold|windy,casual|active,"Insulated vest made from recycled fill for cool days.",in_stock
+P010,Silk Blend Blouse,top,Atelier Nine,110.00,ivory|sage,XS|S|M|L,elegant|minimal,office|events,mild|warm,formal|work,"Fluid silk blend blouse with subtle sheen and drape.",in_stock
+P011,Structured Tote Bag,accessory,Atelier Nine,125.00,black|tan,one-size,minimal|classic,office|commute,all-season,work|travel,"Medium structured tote with laptop sleeve.",in_stock
+P012,Everyday White Sneaker,footwear,MoveWell,74.00,white,7|8|9|10|11,casual|minimal,errands|travel,mild|warm,casual,"Comfort insole sneaker for all-day walking.",in_stock
+P013,Wool Blend Coat,outerwear,Fjord Loom,210.00,charcoal|camel,S|M|L,classic|elegant,office|events,cold,formal|work,"Long wool blend coat with clean lapel silhouette.",in_stock
+P014,High-Rise Straight Jean,bottom,Blue Peak,82.00,indigo|black,26|28|30|32,casual|minimal,weekend|office,mild|cool,casual,"Structured denim with slight stretch and straight leg.",in_stock
+P015,Lightweight Packable Rain Shell,outerwear,EverField,99.00,teal|black,S|M|L|XL,outdoor|sport,travel|hiking,rainy|windy,active|casual,"Seam-sealed shell that packs into its own pocket.",in_stock
+P016,Ribbed Knit Tank,top,Luna Vale,34.00,black|white|sand,XS|S|M|L,minimal|casual,weekend|vacation,warm,casual,"Soft ribbed tank with square neckline.",in_stock
+P017,Pleated Wide-Leg Trouser,bottom,Axis Studio,118.00,black|taupe,XS|S|M|L,elegant|smart-casual,office|events,mild|cool,work|formal,"Flowing trouser with front pleats and relaxed drape.",in_stock
+P018,Chunky Knit Cardigan,top,Fjord Loom,102.00,cream|olive,S|M|L,cozy|casual,remote-work|weekend,cold|mild,casual,"Oversized cardigan for layering at home or out.",low_stock
+P019,Technical Polo Shirt,top,MoveWell,52.00,navy|white,S|M|L|XL,sport|smart-casual,golf|office,warm|mild,active|casual,"Quick-dry polo with clean collar and anti-odor fabric.",in_stock
+P020,Block Heel Ankle Boot,footwear,Urban Form,135.00,black|brown,6|7|8|9|10,elegant|classic,office|events,cold|mild,work|formal,"Stable block heel boot with cushioned footbed.",in_stock
