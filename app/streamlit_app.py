@@ -292,7 +292,8 @@ landing_prompts = [
 
 
 def queue_search() -> None:
-    st.session_state.trigger_search = bool(st.session_state.query_draft.strip())
+    draft = (st.session_state.get("query_draft") or "").strip()
+    st.session_state.trigger_search = bool(draft)
 
 
 def clear_conversation() -> None:
@@ -428,7 +429,8 @@ def run_recommendations(
     use_llm_explanations: bool,
     prompt_variant: str,
 ) -> None:
-    if not query.strip():
+    query_text = (query or "").strip()
+    if not query_text:
         st.warning("Please tell us what you are shopping for before running recommendations.")
         return
     try:
@@ -459,22 +461,22 @@ def run_recommendations(
     start = time.perf_counter()
     if use_agentic_loop:
         orchestrator = AgenticRecommender(retriever)
-        run_result = orchestrator.run(query=query, profile=profile, retrieval_mode=mode, k=5)
+        run_result = orchestrator.run(query=query_text, profile=profile, retrieval_mode=mode, k=5)
         run_results = run_result.results
         st.session_state.last_agent_steps = run_result.steps_as_dicts()
         st.session_state.last_agent_stop_reason = run_result.stop_reason
         st.session_state.last_agent_quality = run_result.quality_score
         st.session_state.effective_query = run_result.final_query
     else:
-        run_results = retriever.search(query=query, profile=profile, retrieval_mode=mode)
+        run_results = retriever.search(query=query_text, profile=profile, retrieval_mode=mode)
         st.session_state.last_agent_steps = []
         st.session_state.last_agent_stop_reason = "direct_retrieval"
         st.session_state.last_agent_quality = None
-        st.session_state.effective_query = query
+        st.session_state.effective_query = query_text
     latency_ms = (time.perf_counter() - start) * 1000
 
     st.session_state.last_results = run_results
-    st.session_state.last_query = query
+    st.session_state.last_query = query_text
     st.session_state.last_profile = profile
     st.session_state.last_mode = mode
     st.session_state.last_latency_ms = round(latency_ms, 2)
@@ -495,25 +497,25 @@ def run_recommendations(
                     items=run_results,
                 )
             elif generate_style_advice is not None:
-                st.session_state.last_match_advice = generate_style_advice(query=query, profile=profile)
+                st.session_state.last_match_advice = generate_style_advice(query=query_text, profile=profile)
             else:
-                st.session_state.last_match_advice = generate_runtime_style_advice(query=query, profile=profile, items=run_results)
+                st.session_state.last_match_advice = generate_runtime_style_advice(query=query_text, profile=profile, items=run_results)
         except Exception as exc:
             # Fall back to a simpler LLM advice prompt if matched-item advice fails.
             try:
                 if generate_style_advice is not None:
-                    st.session_state.last_match_advice = generate_style_advice(query=query, profile=profile)
+                    st.session_state.last_match_advice = generate_style_advice(query=query_text, profile=profile)
                 else:
-                    st.session_state.last_match_advice = generate_runtime_style_advice(query=query, profile=profile, items=run_results)
+                    st.session_state.last_match_advice = generate_runtime_style_advice(query=query_text, profile=profile, items=run_results)
                 st.session_state.last_match_advice_error = ""
             except Exception as fallback_exc:
                 st.session_state.last_match_advice_error = str(fallback_exc or exc)
     else:
         try:
             if generate_style_advice is not None:
-                st.session_state.last_no_match_advice = generate_style_advice(query=query, profile=profile)
+                st.session_state.last_no_match_advice = generate_style_advice(query=query_text, profile=profile)
             else:
-                st.session_state.last_no_match_advice = generate_runtime_style_advice(query=query, profile=profile)
+                st.session_state.last_no_match_advice = generate_runtime_style_advice(query=query_text, profile=profile)
         except Exception as exc:
             st.session_state.last_no_match_advice_error = str(exc)
 
@@ -534,15 +536,17 @@ if not results:
                 "↑",
                 key="submit_query_top",
                 help="Submit query",
-                disabled=not bool(st.session_state.query_draft.strip()),
+                disabled=not bool((st.session_state.get("query_draft") or "").strip()),
             ):
                 st.session_state.trigger_search = True
                 st.rerun()
         for idx, prompt in enumerate(landing_prompts):
-            if st.button(prompt, key=f"landing_prompt_{idx}"):
-                st.session_state.queued_query = prompt
-                st.session_state.trigger_search = True
-                st.rerun()
+            _, prompt_col, _ = st.columns([1, 2, 1])
+            with prompt_col:
+                if st.button(prompt, key=f"landing_prompt_{idx}"):
+                    st.session_state.queued_query = prompt
+                    st.session_state.trigger_search = True
+                    st.rerun()
 
 if results and profile:
     if not profile.size:
@@ -642,14 +646,14 @@ if results:
             "↑",
             key="submit_query_bottom",
             help="Submit query",
-            disabled=not bool(st.session_state.query_draft.strip()),
+            disabled=not bool((st.session_state.get("query_draft") or "").strip()),
         ):
             st.session_state.trigger_search = True
             st.rerun()
 
 if st.session_state.trigger_search:
     st.session_state.trigger_search = False
-    query_to_run = st.session_state.queued_query or st.session_state.query_draft
+    query_to_run = st.session_state.queued_query or st.session_state.get("query_draft") or ""
     st.session_state.queued_query = ""
     run_recommendations(
         query=query_to_run,
