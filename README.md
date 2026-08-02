@@ -3,6 +3,42 @@
 LifeStyled - Dress for the Life You Live  
 LLM Zoomcamp 2026 Capstone Project
 
+## 👗 Project Description
+
+Capstone project for the [DataTalks.Club LLM Zoomcamp](https://github.com/DataTalksClub/llm-zoomcamp).
+
+An end-to-end production-style RAG application for personalized fashion recommendations based on user style, lifestyle, climate, budget, size, and occasion.
+
+[![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![UI](https://img.shields.io/badge/UI-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![Vector DB](https://img.shields.io/badge/Vector%20DB-ChromaDB-5A3EDE)](https://www.trychroma.com/)
+[![Retrieval](https://img.shields.io/badge/Retrieval-BM25%20%2B%20Vector-1F6FEB)](https://en.wikipedia.org/wiki/Okapi_BM25)
+[![LLM](https://img.shields.io/badge/LLM-Groq-F55036)](https://groq.com/)
+[![Package Manager](https://img.shields.io/badge/Packages-uv-6E56CF)](https://docs.astral.sh/uv/)
+[![Container](https://img.shields.io/badge/Container-Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+
+### 📌 Table of Contents
+
+1. [Project Description](#-project-description)
+2. [Problem Description](#problem-description)
+3. [Current Project Status](#current-project-status)
+4. [Step-by-Step Implementation Path](#step-by-step-implementation-path)
+5. [System Architecture & Workflow](#system-architecture--workflow)
+6. [Repository Structure](#repository-structure)
+7. [Data](#data)
+8. [Retrieval Flow](#retrieval-flow)
+9. [Evaluation Plan](#evaluation-plan)
+10. [Interface](#interface)
+11. [Monitoring](#monitoring)
+12. [Reproducibility](#reproducibility)
+13. [Reviewer Quickstart](#reviewer-quickstart)
+14. [Screenshots Checklist](#screenshots-checklist)
+15. [Technology Choices](#technology-choices)
+16. [Evaluation Criteria Mapping (Zoomcamp)](#evaluation-criteria-mapping-zoomcamp)
+17. [Rubric Checklist (Current)](#rubric-checklist-current)
+18. [Containerization](#containerization)
+19. [Notes](#notes)
+
 ## Problem Description
 
 Finding clothing that fits real-life constraints is harder than basic search can handle. People need recommendations that account for:
@@ -76,6 +112,41 @@ In progress:
 - uv-managed dependencies and lockfile
 - env template
 - docker-compose
+
+## System Architecture & Workflow
+
+```mermaid
+flowchart TD
+	A[User Opens Streamlit App] --> B[Profile Inputs<br/>Style, Lifestyle, Climate, Budget, Size, Occasion]
+	B --> C[User Query]
+	C --> D[Query Processing]
+
+	D --> E[Vector Retrieval<br/>ChromaDB TF-IDF Index]
+	D --> F[Lexical Retrieval<br/>BM25]
+
+	E --> G[Candidate Merge]
+	F --> G
+
+	G --> H[Hard Filters<br/>Budget, Size, Stock]
+	H --> I[Profile-Aware Ranking<br/>Style + Lifestyle + Climate + Occasion + Price Fit]
+	I --> J[Top-K Recommendations]
+
+	J --> K{LLM Explanations Enabled?}
+	K -- No --> L[Show Retrieval Reasons]
+	K -- Yes --> M[Groq Explanation Generation<br/>Prompt A default, Prompt B optional]
+	M --> N[Show LLM Explanation + Retrieval Reasons]
+
+	L --> O[User Feedback +1/-1]
+	N --> O
+
+	O --> P[Log Events JSONL<br/>Query, Profile, Result IDs, Latency, Feedback]
+	P --> Q[Monitoring Dashboard<br/>Requests, Latency, Feedback, Categories, Budget Bands]
+
+	R[Offline Evaluation] --> S[Retrieval Eval<br/>Hit-rate@k, Relevance@k]
+	R --> T[Prompt A/B Eval<br/>Manual rubric scoring]
+	S --> U[Model/Prompt Iteration]
+	T --> U
+```
 
 ## Repository Structure
 
