@@ -1,9 +1,11 @@
 import json
 import time
 from pathlib import Path
+import os
 
 import pandas as pd
 import streamlit as st
+from dotenv import load_dotenv
 
 import sys
 
@@ -12,7 +14,10 @@ SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
+load_dotenv(ROOT_DIR / ".env")
+
 from lifestyled.config import EVENT_LOG_PATH
+from lifestyled.explanations import generate_explanation
 from lifestyled.models import UserProfile
 from lifestyled.retrieval import ProductRetriever
 
@@ -48,6 +53,8 @@ with st.sidebar:
 
 query = st.text_input("What are you shopping for today?", "I need an office outfit for mild weather under $140")
 mode = st.radio("Retrieval mode", ["hybrid", "vector"], horizontal=True)
+use_llm_explanations = st.checkbox("Use Groq LLM explanations", value=False)
+prompt_variant = st.selectbox("Explanation prompt variant", ["A", "B"], index=0)
 
 if st.button("Get Recommendations"):
     try:
@@ -72,10 +79,27 @@ if st.button("Get Recommendations"):
         if not results:
             st.warning("No matching items found. Try widening budget, changing size, or adjusting tags.")
         else:
+            allow_llm = use_llm_explanations and bool(os.getenv("GROQ_API_KEY", "").strip())
+            if use_llm_explanations and not allow_llm:
+                st.info("GROQ_API_KEY missing. Showing retrieval reasons only.")
+
             for idx, item in enumerate(results, start=1):
                 st.subheader(f"{idx}. {item.title} (${item.price:.2f})")
                 st.write(f"Brand: {item.brand} | Category: {item.category} | Score: {item.score}")
                 st.write(f"Why: {item.reason}")
+
+                if allow_llm:
+                    try:
+                        llm_text = generate_explanation(
+                            query=query,
+                            profile=profile,
+                            item=item,
+                            prompt_variant=prompt_variant,
+                        )
+                        st.write(f"LLM explanation ({prompt_variant}):")
+                        st.write(llm_text)
+                    except Exception as exc:
+                        st.warning(f"LLM explanation unavailable: {exc}")
 
             st.divider()
             feedback = st.radio("Was this helpful?", ["+1", "-1"], horizontal=True)
@@ -97,6 +121,8 @@ if st.button("Get Recommendations"):
                     "result_ids": [r.product_id for r in results],
                     "response_time_ms": round(latency_ms, 2),
                     "feedback": int(feedback),
+                    "prompt_variant": prompt_variant,
+                    "llm_explanations_enabled": use_llm_explanations,
                 }
                 with EVENT_LOG_PATH.open("a", encoding="utf-8") as f:
                     f.write(json.dumps(event, ensure_ascii=True) + "\n")
