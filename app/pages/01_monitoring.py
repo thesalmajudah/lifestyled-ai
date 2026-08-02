@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+import altair as alt
 import pandas as pd
 import streamlit as st
 
@@ -9,7 +10,88 @@ EVENT_LOG_PATH = ROOT_DIR / "logs" / "events.jsonl"
 CATALOG_PATH = ROOT_DIR / "data" / "raw" / "products_seed.csv"
 
 st.set_page_config(page_title="LifeStyled Monitoring", layout="wide")
-st.title("LifeStyled Monitoring Dashboard")
+
+PINK = "#e75480"
+
+st.markdown(
+        """
+        <style>
+            .monitor-title {
+                color: #2f2f3d;
+                font-weight: 800;
+                margin-bottom: 0.2rem;
+            }
+
+            h2, h3 {
+                color: #e75480 !important;
+            }
+
+            .monitor-divider {
+                height: 4px;
+                border: 0;
+                border-radius: 999px;
+                background: linear-gradient(90deg, #e75480, #ff9eb7);
+                margin-top: 0.15rem;
+                margin-bottom: 0.75rem;
+            }
+
+            section[data-testid="stSidebar"] {
+                background: linear-gradient(180deg, #fff8fb, #fff3f8);
+            }
+
+            [data-testid="stMetricValue"] {
+                color: #5d5267;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+)
+
+
+def pink_line_chart(series: pd.Series, x_label: str, y_label: str) -> None:
+    chart_df = series.reset_index()
+    chart_df.columns = [x_label, y_label]
+    line = (
+        alt.Chart(chart_df)
+        .mark_line(color=PINK, strokeWidth=3)
+        .encode(
+            x=alt.X(f"{x_label}:T"),
+            y=alt.Y(f"{y_label}:Q"),
+            tooltip=[x_label, y_label],
+        )
+    )
+
+    points = (
+        alt.Chart(chart_df)
+        .mark_circle(color=PINK, size=70)
+        .encode(
+            x=alt.X(f"{x_label}:T"),
+            y=alt.Y(f"{y_label}:Q"),
+            tooltip=[x_label, y_label],
+        )
+    )
+
+    chart = (line + points).properties(height=260).configure_range(category=[PINK])
+    st.altair_chart(chart, use_container_width=True)
+
+
+def pink_bar_chart(series: pd.Series, x_label: str, y_label: str) -> None:
+    chart_df = series.reset_index()
+    chart_df.columns = [x_label, y_label]
+    chart = (
+        alt.Chart(chart_df)
+        .mark_bar(color=PINK, cornerRadiusTopLeft=6, cornerRadiusTopRight=6)
+        .encode(
+            x=alt.X(f"{x_label}:N", sort=None),
+            y=alt.Y(f"{y_label}:Q"),
+            tooltip=[x_label, y_label],
+        )
+        .properties(height=260)
+    )
+    st.altair_chart(chart, use_container_width=True)
+
+st.markdown("<h1 class='monitor-title'>LifeStyled Monitoring Dashboard</h1>", unsafe_allow_html=True)
+st.markdown("<hr class='monitor-divider' />", unsafe_allow_html=True)
 st.caption("Operational and feedback metrics from request logs")
 
 if not EVENT_LOG_PATH.exists():
@@ -52,15 +134,15 @@ col4.metric("Hybrid usage %", round(100 * float((df["retrieval_mode"] == "hybrid
 
 st.subheader("1) Requests over time")
 requests_over_time = df.groupby("hour").size().rename("requests")
-st.line_chart(requests_over_time)
+pink_line_chart(requests_over_time, "hour", "requests")
 
 st.subheader("2) Avg response time over time")
 latency_over_time = df.groupby("hour")["response_time_ms"].mean()
-st.line_chart(latency_over_time)
+pink_line_chart(latency_over_time, "hour", "response_time_ms")
 
 st.subheader("3) Feedback trend")
 feedback_over_time = df.groupby("hour")["feedback"].mean()
-st.line_chart(feedback_over_time)
+pink_line_chart(feedback_over_time, "hour", "feedback")
 
 st.subheader("4) Top categories requested")
 cat_lookup = {}
@@ -80,19 +162,19 @@ cat_df = pd.DataFrame(
     [{"category": k, "count": v} for k, v in sorted(cat_counter.items(), key=lambda x: x[1], reverse=True)]
 )
 if not cat_df.empty:
-    st.bar_chart(cat_df.set_index("category"))
+    pink_bar_chart(cat_df.set_index("category")["count"], "category", "count")
 else:
     st.info("No category-like counts yet.")
 
 st.subheader("5) Budget band distribution")
 budget_bins = pd.cut(df["budget_mid"], bins=[0, 50, 100, 150, 250, 9999], labels=["0-50", "51-100", "101-150", "151-250", "250+"])
 budget_dist = budget_bins.value_counts().sort_index()
-st.bar_chart(budget_dist)
+pink_bar_chart(budget_dist, "budget_band", "count")
 
 st.subheader("Optional diagnostics")
 if "prompt_variant" in df.columns:
     prompt_usage = df["prompt_variant"].fillna("none").value_counts()
     st.write("Prompt variant usage")
-    st.bar_chart(prompt_usage)
+    pink_bar_chart(prompt_usage, "prompt_variant", "count")
 
 st.dataframe(df.tail(50), use_container_width=True)
