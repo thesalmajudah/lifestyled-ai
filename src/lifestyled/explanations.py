@@ -36,6 +36,37 @@ def _prompt_b(query: str, profile: UserProfile, item: SearchResult) -> str:
     )
 
 
+def _advice_prompt(query: str, profile: UserProfile) -> str:
+    return (
+        "You are a personal stylist giving practical outfit advice.\n"
+        "The catalog currently has no exact matches, so provide general wearable guidance.\n"
+        "Output format:\n"
+        "1) One short recommendation sentence\n"
+        "2) 3 bullet points with pieces to wear\n"
+        "3) 1 optional swap for dressier or more casual style\n"
+        "Be concise and avoid mentioning product IDs or unavailable catalog items.\n\n"
+        f"User query: {query}\n"
+        f"Profile: {json.dumps(asdict(profile), ensure_ascii=True)}\n"
+    )
+
+
+def _match_advice_prompt(query: str, profile: UserProfile, items: list[SearchResult]) -> str:
+    top_items = [asdict(item) for item in items[:5]]
+    return (
+        "You are a personal stylist.\n"
+        "Use the query, profile, and matched products to give practical styling advice.\n"
+        "Output format:\n"
+        "1) One short recommendation sentence\n"
+        "2) 3 concise bullet points about how to combine or wear pieces\n"
+        "3) 1 optional swap for dressier or more casual variation\n"
+        "Keep it concrete and concise.\n"
+        "Only reference products from the provided matched items.\n\n"
+        f"User query: {query}\n"
+        f"Profile: {json.dumps(asdict(profile), ensure_ascii=True)}\n"
+        f"Matched items: {json.dumps(top_items, ensure_ascii=True)}\n"
+    )
+
+
 def generate_explanation(
     query: str,
     profile: UserProfile,
@@ -64,6 +95,62 @@ def generate_explanation(
             {"role": "user", "content": prompt},
         ],
         temperature=0.2,
+    )
+
+    text = completion.choices[0].message.content or ""
+    return text.strip()
+
+
+def generate_style_advice(
+    query: str,
+    profile: UserProfile,
+    model: str | None = None,
+) -> str:
+    api_key = os.getenv("GROQ_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("GROQ_API_KEY is not set")
+
+    resolved_model = model or os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+    prompt = _advice_prompt(query, profile)
+
+    client = Groq(api_key=api_key)
+    completion = client.chat.completions.create(
+        model=resolved_model,
+        messages=[
+            {"role": "system", "content": "Be concise, practical, and fashion-aware."},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.6,
+    )
+
+    text = completion.choices[0].message.content or ""
+    return text.strip()
+
+
+def generate_match_advice(
+    query: str,
+    profile: UserProfile,
+    items: list[SearchResult],
+    model: str | None = None,
+) -> str:
+    if not items:
+        raise ValueError("items must contain at least one result")
+
+    api_key = os.getenv("GROQ_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("GROQ_API_KEY is not set")
+
+    resolved_model = model or os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+    prompt = _match_advice_prompt(query, profile, items)
+
+    client = Groq(api_key=api_key)
+    completion = client.chat.completions.create(
+        model=resolved_model,
+        messages=[
+            {"role": "system", "content": "Be concise, practical, and fashion-aware."},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.6,
     )
 
     text = completion.choices[0].message.content or ""
