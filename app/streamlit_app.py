@@ -220,11 +220,29 @@ with st.sidebar:
     size = st.selectbox("Size", ["XS", "S", "M", "L", "XL", "30", "32", "34", "36", "26", "28", "7", "8", "9", "10", "11"])
 
 query = st.text_input("What are you shopping for today?", "I need an office outfit for mild weather under $140")
-mode = st.radio("Retrieval mode", ["hybrid", "vector"], horizontal=True)
-use_agentic_loop = st.checkbox("Use agentic retrieval loop (beta)", value=True)
-use_llm_explanations = st.checkbox("Use LLM explanations", value=False)
+mode = st.radio(
+    "Search mode",
+    ["hybrid", "vector"],
+    horizontal=True,
+    help="Hybrid combines text and semantic matching. Vector uses semantic matching only.",
+)
+use_agentic_loop = st.checkbox(
+    "Use smarter search retry (beta)",
+    value=True,
+    help="If first results look weak, the app refines your query once and reranks results.",
+)
+use_llm_explanations = st.checkbox(
+    "Add AI style explanations",
+    value=False,
+    help="Adds short AI-generated reasons for each recommendation.",
+)
 if use_llm_explanations:
-    prompt_variant = st.selectbox("Explanation prompt variant", ["A", "B"], index=0)
+    prompt_variant = st.selectbox(
+        "Explanation style",
+        ["A", "B"],
+        index=0,
+        help="Style A is concise bullets. Style B is structured JSON-like reasoning.",
+    )
 else:
     prompt_variant = "A"
 
@@ -314,10 +332,10 @@ if results and profile:
                     item=item,
                     prompt_variant=st.session_state.last_prompt_variant,
                 )
-                st.write(f"LLM explanation ({st.session_state.last_prompt_variant}):")
+                st.write(f"AI explanation ({st.session_state.last_prompt_variant}):")
                 st.write(llm_text)
             except Exception as exc:
-                st.warning(f"LLM explanation unavailable: {exc}")
+                st.warning(f"AI explanation unavailable: {exc}")
 
     st.divider()
     feedback = st.radio("Was this helpful?", ["+1", "-1"], horizontal=True, key="feedback_choice")
