@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+
+# Local env and secrets
+.env
+.env.*
+!.env.example
+
+# Local data artifacts
+data/processed/chroma/
+data/processed/bm25_state.json
+data/processed/tfidf_vectorizer.joblib
+
+# Local logs
+logs/events.jsonl
+
+# OS/editor
+.DS_Store
+.vscode/
