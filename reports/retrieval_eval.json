@@ -1,0 +1,186 @@
+{
+  "vector": {
+    "mode": "vector",
+    "k": 5,
+    "avg_hit_rate_at_k": 0.8,
+    "avg_relevance_at_k": 0.6333,
+    "cases": [
+      {
+        "id": "Q001",
+        "query": "Need a minimal office outfit for mild weather under 140",
+        "predicted_ids": [
+          "P001",
+          "P005",
+          "P010",
+          "P008",
+          "P017"
+        ],
+        "expected_ids": [
+          "P002",
+          "P006",
+          "P010",
+          "P017"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.5
+      },
+      {
+        "id": "Q002",
+        "query": "I want rainy commute outerwear for work under 150",
+        "predicted_ids": [
+          "P005",
+          "P006",
+          "P010",
+          "P008",
+          "P017"
+        ],
+        "expected_ids": [
+          "P003",
+          "P015"
+        ],
+        "hit_rate_at_k": 0.0,
+        "relevance_at_k": 0.0
+      },
+      {
+        "id": "Q003",
+        "query": "Weekend travel casual layers for cold weather around 120",
+        "predicted_ids": [
+          "P018",
+          "P007",
+          "P009",
+          "P005",
+          "P015"
+        ],
+        "expected_ids": [
+          "P009",
+          "P018",
+          "P007"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 1.0
+      },
+      {
+        "id": "Q004",
+        "query": "Need formal office shoes or boots for cool weather",
+        "predicted_ids": [
+          "P020"
+        ],
+        "expected_ids": [
+          "P020"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 1.0
+      },
+      {
+        "id": "Q005",
+        "query": "Looking for breathable warm-weather tops for weekend trips",
+        "predicted_ids": [
+          "P016",
+          "P001",
+          "P007",
+          "P008",
+          "P004"
+        ],
+        "expected_ids": [
+          "P001",
+          "P016",
+          "P019"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.6667
+      }
+    ]
+  },
+  "hybrid": {
+    "mode": "hybrid",
+    "k": 5,
+    "avg_hit_rate_at_k": 0.8,
+    "avg_relevance_at_k": 0.6333,
+    "cases": [
+      {
+        "id": "Q001",
+        "query": "Need a minimal office outfit for mild weather under 140",
+        "predicted_ids": [
+          "P001",
+          "P005",
+          "P010",
+          "P008",
+          "P017"
+        ],
+        "expected_ids": [
+          "P002",
+          "P006",
+          "P010",
+          "P017"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.5
+      },
+      {
+        "id": "Q002",
+        "query": "I want rainy commute outerwear for work under 150",
+        "predicted_ids": [
+          "P006",
+          "P005",
+          "P010",
+          "P008",
+          "P017"
+        ],
+        "expected_ids": [
+          "P003",
+          "P015"
+        ],
+        "hit_rate_at_k": 0.0,
+        "relevance_at_k": 0.0
+      },
+      {
+        "id": "Q003",
+        "query": "Weekend travel casual layers for cold weather around 120",
+        "predicted_ids": [
+          "P018",
+          "P009",
+          "P005",
+          "P007",
+          "P015"
+        ],
+        "expected_ids": [
+          "P009",
+          "P018",
+          "P007"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 1.0
+      },
+      {
+        "id": "Q004",
+        "query": "Need formal office shoes or boots for cool weather",
+        "predicted_ids": [
+          "P020"
+        ],
+        "expected_ids": [
+          "P020"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 1.0
+      },
+      {
+        "id": "Q005",
+        "query": "Looking for breathable warm-weather tops for weekend trips",
+        "predicted_ids": [
+          "P001",
+          "P016",
+          "P007",
+          "P008",
+          "P004"
+        ],
+        "expected_ids": [
+          "P001",
+          "P016",
+          "P019"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.6667
+      }
+    ]
+  }
+}

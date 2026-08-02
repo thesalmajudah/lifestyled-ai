@@ -1,0 +1,72 @@
+[
+  {
+    "id": "Q001",
+    "query": "Need a minimal office outfit for mild weather under 140",
+    "profile": {
+      "style_tags": ["minimal", "smart-casual"],
+      "lifestyle_tags": ["office", "commute"],
+      "climate_tags": ["mild"],
+      "occasion_tags": ["work"],
+      "budget_min": 40,
+      "budget_max": 140,
+      "size": "M"
+    },
+    "expected_ids": ["P002", "P006", "P010", "P017"]
+  },
+  {
+    "id": "Q002",
+    "query": "I want rainy commute outerwear for work under 150",
+    "profile": {
+      "style_tags": ["classic", "minimal"],
+      "lifestyle_tags": ["commute", "office"],
+      "climate_tags": ["rainy", "cool"],
+      "occasion_tags": ["work"],
+      "budget_min": 60,
+      "budget_max": 160,
+      "size": "L"
+    },
+    "expected_ids": ["P003", "P015"]
+  },
+  {
+    "id": "Q003",
+    "query": "Weekend travel casual layers for cold weather around 120",
+    "profile": {
+      "style_tags": ["casual", "cozy"],
+      "lifestyle_tags": ["travel", "weekend"],
+      "climate_tags": ["cold", "mild"],
+      "occasion_tags": ["casual"],
+      "budget_min": 60,
+      "budget_max": 130,
+      "size": "S"
+    },
+    "expected_ids": ["P009", "P018", "P007"]
+  },
+  {
+    "id": "Q004",
+    "query": "Need formal office shoes or boots for cool weather",
+    "profile": {
+      "style_tags": ["classic", "elegant"],
+      "lifestyle_tags": ["office"],
+      "climate_tags": ["cool", "cold"],
+      "occasion_tags": ["formal", "work"],
+      "budget_min": 80,
+      "budget_max": 150,
+      "size": "9"
+    },
+    "expected_ids": ["P020"]
+  },
+  {
+    "id": "Q005",
+    "query": "Looking for breathable warm-weather tops for weekend trips",
+    "profile": {
+      "style_tags": ["casual", "minimal"],
+      "lifestyle_tags": ["travel", "weekend"],
+      "climate_tags": ["warm"],
+      "occasion_tags": ["casual"],
+      "budget_min": 20,
+      "budget_max": 90,
+      "size": "M"
+    },
+    "expected_ids": ["P001", "P016", "P019"]
+  }
+]
