@@ -286,6 +286,35 @@ def queue_search() -> None:
 def clear_conversation() -> None:
     st.session_state.reset_requested = True
 
+
+def llm_advice_error_message(error_text: str, context: str) -> str:
+    message = (error_text or "").lower()
+    if (
+        "groq_api_key is not set" in message
+        or "api key" in message
+        or "authentication" in message
+        or "unauthorized" in message
+        or "forbidden" in message
+        or "401" in message
+        or "403" in message
+    ):
+        return f"LLM stylist advice unavailable for {context}. Configure GROQ_API_KEY in Streamlit Cloud Secrets."
+    if "429" in message or "rate" in message or "quota" in message or "limit" in message:
+        return "LLM stylist advice is rate-limited right now. Please retry in a few seconds."
+    if "model" in message or "not found" in message or "does not exist" in message or "unsupported" in message:
+        return "LLM stylist advice model is unavailable in this environment. Verify GROQ_MODEL in Secrets."
+    if (
+        "timeout" in message
+        or "timed out" in message
+        or "connection" in message
+        or "network" in message
+        or "502" in message
+        or "503" in message
+        or "504" in message
+    ):
+        return "LLM stylist advice is temporarily unreachable due to a network/provider issue. Please retry."
+    return f"LLM stylist advice is temporarily unavailable for {context}."
+
 with st.sidebar:
     st.header("Your Profile")
     style_tags = st.multiselect(
@@ -477,21 +506,9 @@ if results and profile:
         st.write(st.session_state.last_match_advice)
         st.divider()
     elif st.session_state.last_match_advice_error:
-        advice_error_lower = st.session_state.last_match_advice_error.lower()
-        if (
-            "groq_api_key is not set" in advice_error_lower
-            or "api key" in advice_error_lower
-            or "authentication" in advice_error_lower
-            or "unauthorized" in advice_error_lower
-            or "401" in advice_error_lower
-        ):
-            st.info("LLM stylist advice unavailable for matched results. Configure GROQ_API_KEY in Streamlit Cloud Secrets.")
-        elif "429" in advice_error_lower or "rate" in advice_error_lower:
-            st.info("LLM stylist advice is rate-limited right now. Please retry in a few seconds.")
-        elif "model" in advice_error_lower or "not found" in advice_error_lower:
-            st.info("LLM stylist advice model is unavailable in this environment. Verify GROQ_MODEL in Secrets.")
-        else:
-            st.info("LLM stylist advice is temporarily unavailable for matched results.")
+        st.info(llm_advice_error_message(st.session_state.last_match_advice_error, "matched results"))
+        with st.expander("Advice error details"):
+            st.code(st.session_state.last_match_advice_error)
 
     allow_llm = (
         st.session_state.last_llm_enabled
@@ -562,10 +579,9 @@ elif st.session_state.last_query:
         st.caption("General guidance based on your query and profile when exact catalog matches are unavailable.")
         st.write(st.session_state.last_no_match_advice)
     elif st.session_state.last_no_match_advice_error:
-        if "GROQ_API_KEY is not set" in st.session_state.last_no_match_advice_error:
-            st.info("LLM stylist advice unavailable. Add GROQ_API_KEY to enable dynamic fallback guidance.")
-        else:
-            st.info("LLM stylist advice is temporarily unavailable. Please try again.")
+        st.info(llm_advice_error_message(st.session_state.last_no_match_advice_error, "no-match fallback"))
+        with st.expander("Advice error details"):
+            st.code(st.session_state.last_no_match_advice_error)
 
 if results:
     st.divider()
