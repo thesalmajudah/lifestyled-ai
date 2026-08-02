@@ -17,7 +17,12 @@ load_dotenv(ROOT_DIR / ".env")
 
 from lifestyled.config import EVENT_LOG_PATH
 from lifestyled.agentic import AgenticRecommender
-from lifestyled.explanations import generate_explanation, generate_match_advice, generate_style_advice
+from lifestyled.explanations import generate_explanation, generate_style_advice
+
+try:
+    from lifestyled.explanations import generate_match_advice
+except ImportError:
+    generate_match_advice = None
 from lifestyled.ingestion import build_index
 from lifestyled.models import UserProfile
 from lifestyled.retrieval import ProductRetriever
@@ -400,11 +405,14 @@ def run_recommendations(
     st.session_state.last_match_advice_error = ""
     if run_results:
         try:
-            st.session_state.last_match_advice = generate_match_advice(
-                query=query,
-                profile=profile,
-                items=run_results,
-            )
+            if generate_match_advice is not None:
+                st.session_state.last_match_advice = generate_match_advice(
+                    query=query,
+                    profile=profile,
+                    items=run_results,
+                )
+            else:
+                st.session_state.last_match_advice = generate_style_advice(query=query, profile=profile)
         except Exception as exc:
             st.session_state.last_match_advice_error = str(exc)
     else:
