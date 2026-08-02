@@ -30,13 +30,52 @@ Implemented so far:
 	- metadata filters (budget, size, stock)
 - Streamlit interface
 - feedback logging to JSONL
+- retrieval validation dataset and evaluation script
+- Groq-based LLM explanation layer (Prompt A/B)
+- prompt variant evaluation runner
+- Streamlit monitoring dashboard page with 5 core charts
+- uv-based dependency management configured
 
 In progress:
 
-- retrieval evaluation script and metrics reporting
-- LLM explanation layer (Prompt A vs Prompt B evaluation)
-- monitoring dashboard with 5+ charts
+- prompt variant scoring (A vs B) on evaluation dimensions
 - docker-compose packaging
+
+## Step-by-Step Implementation Path
+
+1. Foundation setup
+- project scaffold
+- config and models
+- seed dataset
+
+2. Retrieval baseline
+- ingestion to Chroma using TF-IDF vectors
+- BM25 state generation
+- vector and hybrid search
+- profile-aware filtering/ranking
+
+3. MVP interface
+- Streamlit recommendation UI
+- user profile controls
+- feedback logging
+
+4. Evaluation artifacts
+- validation query set
+- retrieval metrics script and reports
+
+5. Explanation layer
+- Groq as default provider
+- Prompt A/B support
+- prompt output generation script
+
+6. Monitoring
+- dedicated Streamlit monitoring page
+- five core rubric charts
+
+7. Reproducibility
+- uv-managed dependencies and lockfile
+- env template
+- docker-compose (next)
 
 ## Repository Structure
 
@@ -44,17 +83,24 @@ In progress:
 .
 ├── app/
 │   └── streamlit_app.py
+│   └── pages/
+│       └── 01_monitoring.py
 ├── data/
+│   ├── eval/
+│   │   └── validation_queries.json
 │   ├── raw/
 │   │   └── products_seed.csv
 │   └── processed/
 ├── logs/
 ├── scripts/
 │   └── build_index.py
+│   └── evaluate_retrieval.py
+├── reports/
 ├── src/
 │   └── lifestyled/
 │       ├── __init__.py
 │       ├── config.py
+│       ├── explanations.py
 │       ├── ingestion.py
 │       ├── models.py
 │       └── retrieval.py
@@ -88,7 +134,7 @@ This dataset is a clean seed subset for MVP development and evaluation.
 ## Retrieval Flow
 
 1. Ingest product catalog and build document text per product.
-2. Generate embeddings and store in ChromaDB.
+2. Generate TF-IDF vectors and store in ChromaDB.
 3. Build BM25 corpus state for lexical matching.
 4. At query time:
 	 - run vector retrieval
@@ -112,6 +158,14 @@ Metrics:
 - relevance@k
 
 Use a validation set of user-style shopping queries.
+
+Artifacts:
+
+- validation set: data/eval/validation_queries.json
+- evaluation runner: scripts/evaluate_retrieval.py
+- generated reports:
+	- reports/retrieval_eval.json
+	- reports/retrieval_eval.md
 
 ### LLM Evaluation
 
@@ -150,53 +204,69 @@ Logged fields include:
 
 Planned dashboard charts (>=5):
 
-- requests over time
-- avg response time over time
-- feedback trend
-- top categories requested
-- budget band distribution
-- optional cost trend
+- [x] requests over time
+- [x] avg response time over time
+- [x] feedback trend
+- [x] top categories requested
+- [x] budget band distribution
+- [ ] optional cost trend
+
+Monitoring page:
+
+- App includes a dedicated Streamlit page at app/pages/01_monitoring.py.
+- It reads logs/events.jsonl and renders the charts above.
 
 ## Reproducibility
 
-### 1) Create and activate environment
+### 1) Install dependencies with uv
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+uv sync
 ```
 
 ### 2) Build index
 
 ```bash
-PYTHONPATH=src python scripts/build_index.py
+uv run env PYTHONPATH=src python scripts/build_index.py
 ```
 
 ### 3) Run app
 
 ```bash
-PYTHONPATH=src streamlit run app/streamlit_app.py
+uv run env PYTHONPATH=src streamlit run app/streamlit_app.py
 ```
 
-### 4) Environment variables
+### 4) Run retrieval evaluation
 
-Copy `.env.example` to `.env` and fill values as needed.
+```bash
+uv run env PYTHONPATH=src python scripts/evaluate_retrieval.py
+```
+
+### 5) Environment variables
+
+Copy .env.example to .env and fill values as needed.
+
+### 6) Prompt A/B output generation
+
+```bash
+uv run env PYTHONPATH=src python scripts/evaluate_prompt_variants.py
+```
 
 ## Technology Choices
 
 - Python for implementation
 - Streamlit for UI
-- sentence-transformers for embeddings
+- scikit-learn TF-IDF vectors for CPU-safe embeddings
 - ChromaDB for vector storage
 - rank-bm25 for lexical retrieval
+- Groq for explanation generation
 - JSONL logging for monitoring events
 
 ## Evaluation Criteria Mapping (Zoomcamp)
 
 - Problem description: this README section "Problem Description"
 - Retrieval flow: section "Retrieval Flow"
-- Retrieval evaluation: section "Evaluation Plan / Retrieval Evaluation" (in progress)
+- Retrieval evaluation: section "Evaluation Plan / Retrieval Evaluation" (implemented; reports in reports/)
 - LLM evaluation: section "Evaluation Plan / LLM Evaluation" (in progress)
 - Interface: Streamlit app
 - Ingestion pipeline: script-based ingestion baseline implemented
@@ -209,6 +279,23 @@ Best practices goals:
 - [x] Hybrid retrieval evaluated
 - [ ] Re-ranking iteration planned
 - [ ] Query rewriting iteration planned
+
+### Prompt Variant Artifacts
+
+- prompt variant runner: scripts/evaluate_prompt_variants.py
+- generated output file: reports/prompt_variant_outputs.json
+
+Run prompt variant output generation:
+
+```bash
+uv run env PYTHONPATH=src python scripts/evaluate_prompt_variants.py
+```
+
+Notes:
+
+- Default provider is Groq.
+- Set GROQ_API_KEY in local .env (never commit real keys).
+- Streamlit includes a toggle for LLM explanations and a Prompt A/B selector.
 
 ## Notes
 
