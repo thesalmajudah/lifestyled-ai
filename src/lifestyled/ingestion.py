@@ -88,11 +88,12 @@ def build_index(
 
     chroma_dir.mkdir(parents=True, exist_ok=True)
     client = chromadb.PersistentClient(path=str(chroma_dir))
-    collection = client.get_or_create_collection(name=collection_name)
-
-    existing = collection.get(include=[])
-    if existing.get("ids"):
-        collection.delete(ids=existing["ids"])
+    # Recreate the collection to handle embedding dimension changes safely.
+    try:
+        client.delete_collection(name=collection_name)
+    except Exception:
+        pass
+    collection = client.create_collection(name=collection_name)
 
     collection.add(
         ids=ids,

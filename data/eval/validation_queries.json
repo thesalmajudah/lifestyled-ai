@@ -11,21 +11,21 @@
       "budget_max": 140,
       "size": "M"
     },
-    "expected_ids": ["P002", "P006", "P010", "P017"]
+    "expected_ids": ["P010", "P493", "P494", "P057"]
   },
   {
     "id": "Q002",
-    "query": "I want rainy commute outerwear for work under 150",
+    "query": "I want rainy commute outerwear for work under 180",
     "profile": {
       "style_tags": ["classic", "minimal"],
       "lifestyle_tags": ["commute", "office"],
       "climate_tags": ["rainy", "cool"],
       "occasion_tags": ["work"],
       "budget_min": 60,
-      "budget_max": 160,
+      "budget_max": 180,
       "size": "L"
     },
-    "expected_ids": ["P003", "P015"]
+    "expected_ids": ["P003", "P006", "P495"]
   },
   {
     "id": "Q003",
@@ -53,7 +53,7 @@
       "budget_max": 150,
       "size": "9"
     },
-    "expected_ids": ["P020"]
+    "expected_ids": ["P020", "P274"]
   },
   {
     "id": "Q005",
@@ -68,5 +68,103 @@
       "size": "M"
     },
     "expected_ids": ["P001", "P016", "P019"]
+  },
+  {
+    "id": "Q006",
+    "query": "Looking for a special occasion evening dress under 500",
+    "profile": {
+      "style_tags": ["elegant", "feminine"],
+      "lifestyle_tags": ["events", "dinner"],
+      "climate_tags": ["mild", "cool"],
+      "occasion_tags": ["special occasion", "formal"],
+      "budget_min": 150,
+      "budget_max": 500,
+      "size": "M"
+    },
+    "expected_ids": ["P485", "P486", "P488"]
+  },
+  {
+    "id": "Q007",
+    "query": "Need polished workwear for office commute around 150",
+    "profile": {
+      "style_tags": ["minimal", "classic"],
+      "lifestyle_tags": ["office", "commute"],
+      "climate_tags": ["all-season", "mild"],
+      "occasion_tags": ["work", "formal"],
+      "budget_min": 90,
+      "budget_max": 200,
+      "size": "S"
+    },
+    "expected_ids": ["P493", "P494", "P496"]
+  },
+  {
+    "id": "Q008",
+    "query": "Need one-size accessories for travel and special occasion",
+    "profile": {
+      "style_tags": ["classic", "elegant"],
+      "lifestyle_tags": ["travel", "events"],
+      "climate_tags": ["mild", "all-season"],
+      "occasion_tags": ["special occasion", "travel"],
+      "budget_min": 80,
+      "budget_max": 320,
+      "size": "one-size"
+    },
+    "expected_ids": ["P312", "P313", "P011"]
+  },
+  {
+    "id": "Q009",
+    "query": "Want an elegant jumpsuit for events and travel under 320",
+    "profile": {
+      "style_tags": ["elegant", "minimal"],
+      "lifestyle_tags": ["events", "travel"],
+      "climate_tags": ["mild", "all-season"],
+      "occasion_tags": ["special occasion", "dinner"],
+      "budget_min": 100,
+      "budget_max": 320,
+      "size": "L"
+    },
+    "expected_ids": ["P448", "P449", "P450"]
+  },
+  {
+    "id": "Q010",
+    "query": "Looking for vacation swimwear for warm weather around 130",
+    "profile": {
+      "style_tags": ["casual", "feminine"],
+      "lifestyle_tags": ["vacation", "weekend"],
+      "climate_tags": ["warm", "mild"],
+      "occasion_tags": ["casual", "travel"],
+      "budget_min": 35,
+      "budget_max": 140,
+      "size": "M"
+    },
+    "expected_ids": ["P475", "P476", "P477"]
+  },
+  {
+    "id": "Q011",
+    "query": "Need activewear for gym and errands in warm weather",
+    "profile": {
+      "style_tags": ["sport", "minimal"],
+      "lifestyle_tags": ["gym", "errands"],
+      "climate_tags": ["warm", "cool"],
+      "occasion_tags": ["active", "casual"],
+      "budget_min": 70,
+      "budget_max": 180,
+      "size": "M"
+    },
+    "expected_ids": ["P421", "P424", "P425"]
+  },
+  {
+    "id": "Q012",
+    "query": "Need a premium tote or shoulder bag for office events",
+    "profile": {
+      "style_tags": ["minimal", "classic"],
+      "lifestyle_tags": ["office", "events"],
+      "climate_tags": ["all-season", "mild"],
+      "occasion_tags": ["work", "special occasion"],
+      "budget_min": 180,
+      "budget_max": 420,
+      "size": "one-size"
+    },
+    "expected_ids": ["P338", "P341", "P340"]
   }
 ]

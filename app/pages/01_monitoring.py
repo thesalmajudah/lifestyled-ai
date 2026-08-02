@@ -167,7 +167,11 @@ else:
     st.info("No category-like counts yet.")
 
 st.subheader("5) Budget band distribution")
-budget_bins = pd.cut(df["budget_mid"], bins=[0, 50, 100, 150, 250, 9999], labels=["0-50", "51-100", "101-150", "151-250", "250+"])
+budget_bins = pd.cut(
+    df["budget_mid"],
+    bins=[0, 50, 100, 150, 250, 400, 600, 9999],
+    labels=["0-50", "51-100", "101-150", "151-250", "251-400", "401-600", "600+"],
+)
 budget_dist = budget_bins.value_counts().sort_index()
 pink_bar_chart(budget_dist, "budget_band", "count")
 

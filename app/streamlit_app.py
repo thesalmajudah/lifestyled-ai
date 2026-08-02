@@ -204,7 +204,7 @@ with st.sidebar:
         ["work", "casual", "formal", "dinner", "active", "travel", "brunch", "special occasion"],
         default=["work"],
     )
-    budget_min, budget_max = st.slider("Budget range", 20, 250, (50, 140))
+    budget_min, budget_max = st.slider("Budget range", 20, 600, (50, 180))
     size = st.selectbox("Size", ["XS", "S", "M", "L", "XL", "30", "32", "34", "36", "26", "28", "7", "8", "9", "10", "11"])
 
 query = st.text_input("What are you shopping for today?", "I need an office outfit for mild weather under $140")
