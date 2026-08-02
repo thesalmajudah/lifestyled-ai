@@ -97,6 +97,10 @@ st.markdown(
 
             section[data-testid="stSidebar"] {
                 background: linear-gradient(180deg, #fff8fb, #fff3f8);
+                position: sticky;
+                top: 0;
+                height: 100vh;
+                overflow-y: auto;
             }
 
             section[data-testid="stSidebar"] h1,
@@ -194,23 +198,68 @@ if "effective_query" not in st.session_state:
 if "query_draft" not in st.session_state:
     st.session_state.query_draft = ""
 if "mode_pref" not in st.session_state:
-    st.session_state.mode_pref = "hybrid"
+    st.session_state.mode_pref = None
 if "agentic_pref" not in st.session_state:
-    st.session_state.agentic_pref = True
+    st.session_state.agentic_pref = False
 if "llm_pref" not in st.session_state:
     st.session_state.llm_pref = False
 if "prompt_pref" not in st.session_state:
-    st.session_state.prompt_pref = "A"
+    st.session_state.prompt_pref = None
+if "show_agent_steps" not in st.session_state:
+    st.session_state.show_agent_steps = False
 if "trigger_search" not in st.session_state:
     st.session_state.trigger_search = False
 if "queued_query" not in st.session_state:
     st.session_state.queued_query = ""
+if "profile_style_tags" not in st.session_state:
+    st.session_state.profile_style_tags = []
+if "profile_lifestyle_tags" not in st.session_state:
+    st.session_state.profile_lifestyle_tags = []
+if "profile_climate_tags" not in st.session_state:
+    st.session_state.profile_climate_tags = []
+if "profile_occasion_tags" not in st.session_state:
+    st.session_state.profile_occasion_tags = []
+if "profile_budget_range" not in st.session_state:
+    st.session_state.profile_budget_range = (5, 600)
+if "profile_size" not in st.session_state:
+    st.session_state.profile_size = None
+if "reset_requested" not in st.session_state:
+    st.session_state.reset_requested = False
+
+if st.session_state.reset_requested:
+    st.session_state.last_results = []
+    st.session_state.last_query = ""
+    st.session_state.last_profile = None
+    st.session_state.last_mode = "hybrid"
+    st.session_state.last_latency_ms = None
+    st.session_state.last_prompt_variant = "A"
+    st.session_state.last_llm_enabled = False
+    st.session_state.last_agentic_enabled = True
+    st.session_state.last_agent_steps = []
+    st.session_state.last_agent_stop_reason = ""
+    st.session_state.last_agent_quality = None
+    st.session_state.effective_query = ""
+    st.session_state.query_draft = ""
+    st.session_state.mode_pref = None
+    st.session_state.agentic_pref = False
+    st.session_state.llm_pref = False
+    st.session_state.prompt_pref = None
+    st.session_state.show_agent_steps = False
+    st.session_state.trigger_search = False
+    st.session_state.queued_query = ""
+    st.session_state.profile_style_tags = []
+    st.session_state.profile_lifestyle_tags = []
+    st.session_state.profile_climate_tags = []
+    st.session_state.profile_occasion_tags = []
+    st.session_state.profile_budget_range = (5, 600)
+    st.session_state.profile_size = None
+    st.session_state.pop("feedback_choice", None)
+    st.session_state.reset_requested = False
 
 landing_prompts = [
-    "I need a minimal office outfit for mild weather under 140",
+    "I need a minimal office outfit for mild weather",
     "Looking for vacation swimwear for warm weather around 130",
-    "Need polished workwear for office commute around 150",
-    "Need a premium tote or shoulder bag for office events",
+    "Need polished workwear for office commute",
 ]
 
 
@@ -221,31 +270,35 @@ def options_dropdown(label: str):
 
 
 def queue_search() -> None:
-    st.session_state.trigger_search = True
+    st.session_state.trigger_search = bool(st.session_state.query_draft.strip())
+
+
+def clear_conversation() -> None:
+    st.session_state.reset_requested = True
 
 with st.sidebar:
     st.header("Your Profile")
     style_tags = st.multiselect(
         "Aesthetic",
         ["minimal", "casual", "smart-casual", "classic", "elegant", "sport", "outdoor", "street", "cozy"],
-        default=[],
+        key="profile_style_tags",
     )
     lifestyle_tags = st.multiselect(
         "Lifestyle",
         ["office", "remote-work", "commute", "travel", "weekend", "gym", "events", "errands", "vacation", "hiking"],
-        default=[],
+        key="profile_lifestyle_tags",
     )
     climate_tags = st.multiselect(
         "Climate",
         ["warm", "mild", "cool", "cold", "rainy", "windy", "all-season"],
-        default=[],
+        key="profile_climate_tags",
     )
     occasion_tags = st.multiselect(
         "Occasion",
         ["work", "casual", "formal", "dinner", "active", "travel", "brunch", "special occasion"],
-        default=[],
+        key="profile_occasion_tags",
     )
-    budget_min, budget_max = st.slider("Budget range", 5, 600, (5, 600))
+    budget_min, budget_max = st.slider("Budget range", 5, 600, (5, 600), key="profile_budget_range")
     size = st.selectbox(
         "Size",
         [
@@ -266,20 +319,33 @@ with st.sidebar:
             "10",
             "11",
         ],
+        key="profile_size",
         index=None,
         placeholder="Choose size",
+    )
+    st.divider()
+    st.button(
+        "Clear conversation",
+        key="clear_conversation_btn",
+        help="Reset query, profile, tuning options, and results",
+        use_container_width=True,
+        on_click=clear_conversation,
     )
 
 
 def run_recommendations(
     query: str,
-    mode: str,
+    mode: str | None,
     use_agentic_loop: bool,
     use_llm_explanations: bool,
-    prompt_variant: str,
+    prompt_variant: str | None,
 ) -> None:
     if not query.strip():
         st.warning("Please tell us what you are shopping for before running recommendations.")
+        return
+    mode = mode or "hybrid"
+    if use_llm_explanations and not prompt_variant:
+        st.warning("Please choose an explanation style in Tune recommendations.")
         return
     if size is None:
         st.warning("Please select your size for accurate recommendations.")
@@ -344,16 +410,25 @@ if not results:
     st.markdown("<h2 style='text-align:center; color:#1f2433 !important; margin-top: 1.8rem;'>What are you shopping for today?</h2>", unsafe_allow_html=True)
     _, center_col, _ = st.columns([1, 1.6, 1])
     with center_col:
-        st.text_input("What are you shopping for today?", key="query_draft", label_visibility="collapsed", on_change=queue_search)
-        if st.button("Submit", key="submit_query_top", disabled=not st.session_state.query_draft.strip()):
-            st.session_state.trigger_search = True
-            st.rerun()
+        query_col, submit_col = st.columns([12, 1])
+        with query_col:
+            st.text_input("What are you shopping for today?", key="query_draft", label_visibility="collapsed", on_change=queue_search)
+        with submit_col:
+            if st.button(
+                "↑",
+                key="submit_query_top",
+                help="Submit query",
+                disabled=not bool(st.session_state.query_draft.strip()),
+            ):
+                st.session_state.trigger_search = True
+                st.rerun()
         with options_dropdown("Tune recommendations"):
-            st.radio(
+            st.selectbox(
                 "Search mode",
                 ["hybrid", "vector"],
                 key="mode_pref",
-                horizontal=True,
+                index=None,
+                placeholder="Choose search mode",
                 help="Hybrid combines text and semantic matching. Vector uses semantic matching only.",
             )
             st.checkbox(
@@ -371,11 +446,18 @@ if not results:
                     "Explanation style",
                     ["A", "B"],
                     key="prompt_pref",
+                    index=None,
+                    placeholder="Choose explanation style",
                     help="Style A is concise bullets. Style B is structured JSON-like reasoning.",
                 )
+                st.caption("Style A: short, readable shopper guidance. Style B: structured, evidence-like reasoning format.")
             else:
-                st.session_state.prompt_pref = "A"
-
+                st.session_state.prompt_pref = None
+            st.checkbox(
+                "Show agent diagnostics",
+                key="show_agent_steps",
+                help="Shows stop reason, quality score, and step-by-step agent trace after running recommendations.",
+            )
         for idx, prompt in enumerate(landing_prompts):
             if st.button(prompt, key=f"landing_prompt_{idx}"):
                 st.session_state.queued_query = prompt
@@ -383,7 +465,7 @@ if not results:
                 st.rerun()
 
 if results and profile:
-    if st.session_state.last_agentic_enabled:
+    if st.session_state.last_agentic_enabled and st.session_state.show_agent_steps:
         st.caption(
             "Agentic loop: "
             f"stop_reason={st.session_state.last_agent_stop_reason}; "
@@ -454,16 +536,25 @@ elif st.session_state.last_query:
 if results:
     st.divider()
     st.markdown("### Continue searching")
-    st.text_input("What are you shopping for today?", key="query_draft", on_change=queue_search)
-    if st.button("Submit", key="submit_query_bottom", disabled=not st.session_state.query_draft.strip()):
-        st.session_state.trigger_search = True
-        st.rerun()
+    query_col, submit_col = st.columns([12, 1])
+    with query_col:
+        st.text_input("What are you shopping for today?", key="query_draft", on_change=queue_search)
+    with submit_col:
+        if st.button(
+            "↑",
+            key="submit_query_bottom",
+            help="Submit query",
+            disabled=not bool(st.session_state.query_draft.strip()),
+        ):
+            st.session_state.trigger_search = True
+            st.rerun()
     with options_dropdown("Tune recommendations"):
-        st.radio(
+        st.selectbox(
             "Search mode",
             ["hybrid", "vector"],
             key="mode_pref",
-            horizontal=True,
+            index=None,
+            placeholder="Choose search mode",
             help="Hybrid combines text and semantic matching. Vector uses semantic matching only.",
         )
         st.checkbox(
@@ -481,11 +572,18 @@ if results:
                 "Explanation style",
                 ["A", "B"],
                 key="prompt_pref",
+                index=None,
+                placeholder="Choose explanation style",
                 help="Style A is concise bullets. Style B is structured JSON-like reasoning.",
             )
+            st.caption("Style A: short, readable shopper guidance. Style B: structured, evidence-like reasoning format.")
         else:
-            st.session_state.prompt_pref = "A"
-
+            st.session_state.prompt_pref = None
+        st.checkbox(
+            "Show agent diagnostics",
+            key="show_agent_steps",
+            help="Shows stop reason, quality score, and step-by-step agent trace after running recommendations.",
+        )
 if st.session_state.trigger_search:
     st.session_state.trigger_search = False
     query_to_run = st.session_state.queued_query or st.session_state.query_draft
