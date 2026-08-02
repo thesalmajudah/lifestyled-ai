@@ -52,10 +52,10 @@ class AgenticRecommender:
         return round(0.85 * avg_score + 0.15 * unique_categories, 4)
 
     def _rewrite_query(self, query: str, profile: UserProfile) -> str:
-        style = (profile.style_tags[0] if profile.style_tags else "minimal").strip().lower()
-        lifestyle = (profile.lifestyle_tags[0] if profile.lifestyle_tags else "daily").strip().lower()
-        climate = (profile.climate_tags[0] if profile.climate_tags else "mild").strip().lower()
-        occasion = (profile.occasion_tags[0] if profile.occasion_tags else "casual").strip().lower()
+        style = str(profile.style_tags[0] if profile.style_tags else "minimal").strip().lower()
+        lifestyle = str(profile.lifestyle_tags[0] if profile.lifestyle_tags else "daily").strip().lower()
+        climate = str(profile.climate_tags[0] if profile.climate_tags else "mild").strip().lower()
+        occasion = str(profile.occasion_tags[0] if profile.occasion_tags else "casual").strip().lower()
 
         hint = "versatile pieces"
         if occasion in {"work", "formal"} or lifestyle in {"office", "commute"}:
