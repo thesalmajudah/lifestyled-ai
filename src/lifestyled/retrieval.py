@@ -119,7 +119,7 @@ class ProductRetriever:
     def _passes_filters(self, metadata: Dict[str, str], profile: UserProfile) -> bool:
         sizes = [s.strip().lower() for s in str(metadata["sizes"]).split("|")]
         stock_ok = metadata.get("stock_status", "in_stock") in {"in_stock", "low_stock"}
-        size_ok = profile.size.strip().lower() in sizes
+        size_ok = True if not profile.size else profile.size.strip().lower() in sizes
         budget_ok = profile.budget_min <= float(metadata["price"]) <= profile.budget_max
         return stock_ok and size_ok and budget_ok
 

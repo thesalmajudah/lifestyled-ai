@@ -375,7 +375,6 @@ with st.sidebar:
         ["work", "casual", "formal", "dinner", "active", "travel", "brunch", "special occasion"],
         key="profile_occasion_tags",
     )
-    budget_min, budget_max = st.slider("Budget range", 5, 600, key="profile_budget_range")
     size = st.selectbox(
         "Size",
         [
@@ -400,6 +399,7 @@ with st.sidebar:
         index=None,
         placeholder="Choose size",
     )
+    budget_min, budget_max = st.slider("Budget range", 5, 600, key="profile_budget_range")
     st.divider()
     st.button(
         "Clear conversation",
@@ -420,10 +420,6 @@ def run_recommendations(
     if not query.strip():
         st.warning("Please tell us what you are shopping for before running recommendations.")
         return
-    if size is None:
-        st.warning("Please select your size for accurate recommendations.")
-        return
-
     try:
         retriever = ProductRetriever()
     except FileNotFoundError:
@@ -538,6 +534,9 @@ if not results:
                 st.rerun()
 
 if results and profile:
+    if not profile.size:
+        st.caption("Size is optional. Select a size in the sidebar to filter results by fit availability.")
+
     if st.session_state.last_match_advice:
         st.markdown("### Stylist advice")
         st.caption("LLM-generated guidance based on your query, profile, and top matched items.")

@@ -10,7 +10,7 @@ class UserProfile:
     occasion_tags: List[str]
     budget_min: float
     budget_max: float
-    size: str
+    size: str | None
 
 
 @dataclass
