@@ -75,6 +75,12 @@ st.markdown(
                 color: var(--ls-pink) !important;
             }
 
+            h2.shopping-title {
+                color: #111111 !important;
+                font-size: 1rem !important;
+                font-weight: 400 !important;
+            }
+
             .brand-divider {
                 height: 4px;
                 border: 0;
@@ -180,6 +186,11 @@ st.markdown(
             .stNumberInput p,
             .stNumberInput span {
                 color: #5d5267 !important;
+            }
+
+            /* Hide the static min/max labels under the budget slider; keep handle values visible */
+            .stSlider [data-testid="stSliderTickBar"] {
+                display: none !important;
             }
 
         </style>
@@ -512,12 +523,12 @@ results = st.session_state.last_results
 profile = st.session_state.last_profile
 
 if not results:
-    st.markdown("<h2 style='text-align:center; color:#1f2433 !important; margin-top: 1.8rem;'>What are you shopping for today?</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 class='shopping-title' style='text-align:center; margin-top: 1.8rem;'>What are you looking for today?</h2>", unsafe_allow_html=True)
     _, center_col, _ = st.columns([1, 1.6, 1])
     with center_col:
         query_col, submit_col = st.columns([12, 1])
         with query_col:
-            st.text_input("What are you shopping for today?", key="query_draft", label_visibility="collapsed", on_change=queue_search)
+            st.text_input("What are you looking for today?", key="query_draft", label_visibility="collapsed", on_change=queue_search)
         with submit_col:
             if st.button(
                 "↑",
