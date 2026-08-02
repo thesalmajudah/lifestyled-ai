@@ -18,6 +18,7 @@ load_dotenv(ROOT_DIR / ".env")
 from lifestyled.config import EVENT_LOG_PATH
 from lifestyled.agentic import AgenticRecommender
 from lifestyled.explanations import generate_explanation
+from lifestyled.ingestion import build_index
 from lifestyled.models import UserProfile
 from lifestyled.retrieval import ProductRetriever
 
@@ -231,43 +232,55 @@ if st.button("Get Recommendations"):
     try:
         retriever = ProductRetriever()
     except FileNotFoundError:
-        st.error("Index not found. Run: PYTHONPATH=src python scripts/build_index.py")
+        with st.spinner("Index missing. Building local index from catalog..."):
+            try:
+                build_index()
+                retriever = ProductRetriever()
+                st.info("Index built successfully. Running recommendations...")
+            except Exception as exc:
+                st.error(
+                    "Index build failed. Ensure data/raw/products_seed.csv is present and dependencies are installed. "
+                    f"Details: {exc}"
+                )
+                retriever = None
+        if retriever is None:
+            st.stop()
+
+    profile = UserProfile(
+        style_tags=style_tags,
+        lifestyle_tags=lifestyle_tags,
+        climate_tags=climate_tags,
+        occasion_tags=occasion_tags,
+        budget_min=float(budget_min),
+        budget_max=float(budget_max),
+        size=size,
+    )
+
+    start = time.perf_counter()
+    if use_agentic_loop:
+        orchestrator = AgenticRecommender(retriever)
+        run_result = orchestrator.run(query=query, profile=profile, retrieval_mode=mode, k=5)
+        results = run_result.results
+        st.session_state.last_agent_steps = run_result.steps_as_dicts()
+        st.session_state.last_agent_stop_reason = run_result.stop_reason
+        st.session_state.last_agent_quality = run_result.quality_score
+        st.session_state.effective_query = run_result.final_query
     else:
-        profile = UserProfile(
-            style_tags=style_tags,
-            lifestyle_tags=lifestyle_tags,
-            climate_tags=climate_tags,
-            occasion_tags=occasion_tags,
-            budget_min=float(budget_min),
-            budget_max=float(budget_max),
-            size=size,
-        )
+        results = retriever.search(query=query, profile=profile, retrieval_mode=mode)
+        st.session_state.last_agent_steps = []
+        st.session_state.last_agent_stop_reason = "direct_retrieval"
+        st.session_state.last_agent_quality = None
+        st.session_state.effective_query = query
+    latency_ms = (time.perf_counter() - start) * 1000
 
-        start = time.perf_counter()
-        if use_agentic_loop:
-            orchestrator = AgenticRecommender(retriever)
-            run_result = orchestrator.run(query=query, profile=profile, retrieval_mode=mode, k=5)
-            results = run_result.results
-            st.session_state.last_agent_steps = run_result.steps_as_dicts()
-            st.session_state.last_agent_stop_reason = run_result.stop_reason
-            st.session_state.last_agent_quality = run_result.quality_score
-            st.session_state.effective_query = run_result.final_query
-        else:
-            results = retriever.search(query=query, profile=profile, retrieval_mode=mode)
-            st.session_state.last_agent_steps = []
-            st.session_state.last_agent_stop_reason = "direct_retrieval"
-            st.session_state.last_agent_quality = None
-            st.session_state.effective_query = query
-        latency_ms = (time.perf_counter() - start) * 1000
-
-        st.session_state.last_results = results
-        st.session_state.last_query = query
-        st.session_state.last_profile = profile
-        st.session_state.last_mode = mode
-        st.session_state.last_latency_ms = round(latency_ms, 2)
-        st.session_state.last_prompt_variant = prompt_variant
-        st.session_state.last_llm_enabled = use_llm_explanations
-        st.session_state.last_agentic_enabled = use_agentic_loop
+    st.session_state.last_results = results
+    st.session_state.last_query = query
+    st.session_state.last_profile = profile
+    st.session_state.last_mode = mode
+    st.session_state.last_latency_ms = round(latency_ms, 2)
+    st.session_state.last_prompt_variant = prompt_variant
+    st.session_state.last_llm_enabled = use_llm_explanations
+    st.session_state.last_agentic_enabled = use_agentic_loop
 
 results = st.session_state.last_results
 profile = st.session_state.last_profile

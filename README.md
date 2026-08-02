@@ -27,15 +27,16 @@
 11. [Monitoring](#monitoring)
 12. [Reproducibility](#reproducibility)
 13. [Live Demo](#live-demo)
-14. [Demo Video](#demo-video)
-15. [Reviewer Quickstart](#reviewer-quickstart)
-16. [Demo Assets Checklist](#demo-assets-checklist)
-17. [Technology Choices](#technology-choices)
-18. [Evaluation Criteria Mapping (Zoomcamp)](#evaluation-criteria-mapping-zoomcamp)
-19. [Evaluation Criteria Checklist](#evaluation-criteria-checklist)
-20. [Rubric Checklist (Current)](#rubric-checklist-current)
-21. [Containerization](#containerization)
-22. [Notes](#notes)
+14. [Permanent Deployment (Streamlit Cloud)](#permanent-deployment-streamlit-cloud)
+15. [Demo Video](#demo-video)
+16. [Reviewer Quickstart](#reviewer-quickstart)
+17. [Demo Assets Checklist](#demo-assets-checklist)
+18. [Technology Choices](#technology-choices)
+19. [Evaluation Criteria Mapping (Zoomcamp)](#evaluation-criteria-mapping-zoomcamp)
+20. [Evaluation Criteria Checklist](#evaluation-criteria-checklist)
+21. [Rubric Checklist (Current)](#rubric-checklist-current)
+22. [Containerization](#containerization)
+23. [Notes](#notes)
 
 ## Problem Description
 
@@ -384,6 +385,24 @@ Notes:
 
 - This URL is live while the Codespace/session is running.
 - For a permanent public URL, deploy to Streamlit Community Cloud and place that link here.
+
+## Permanent Deployment (Streamlit Cloud)
+
+Use this for a stable public app URL suitable for submission review:
+
+1. Push latest code to GitHub (already done).
+2. In Streamlit Community Cloud, create a new app from this repo.
+3. Set the app entrypoint to `app/streamlit_app.py`.
+4. Add required secrets in Streamlit settings:
+	- `GROQ_API_KEY` (optional if you want LLM explanations in hosted demo)
+	- `GROQ_MODEL` (optional; defaults are handled in code)
+5. Deploy and copy the public app URL into the Live Demo section above.
+
+Deployment behavior notes:
+
+- The app now auto-builds the retrieval index on first recommendation request if the index files are missing.
+- First request in a fresh deployment may take longer due to index build.
+- The hosted app still works without `GROQ_API_KEY`; in that case it shows retrieval reasons only.
 
 ## Demo Video
 
