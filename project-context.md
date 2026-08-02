@@ -29,7 +29,7 @@ Users struggle to find clothing that fits their daily life and preferences. Life
 ## Preferred Stack
 - Python
 - Streamlit
-- sentence-transformers
+- scikit-learn (TF-IDF vectors)
 - ChromaDB or FAISS
 - rank-bm25 (if hybrid retrieval)
 - SQLite
@@ -100,11 +100,15 @@ Dashboard charts (target >=5):
 - Groq explanation layer added with Prompt A/B
 - Streamlit monitoring dashboard page added
 - uv dependency workflow enabled (pyproject + uv lock)
+- Dockerfile and docker-compose added
+- Prompt variant scoring script added
+- Prompt A/B manual scoring completed
+- Default prompt selected: A (tie-break by personalization + groundedness)
 
 ## Next 3 Tasks
-1. Run retrieval evaluation and check vector vs hybrid metrics
-2. Generate prompt variant outputs and score A vs B
-3. Add Dockerfile and docker-compose for reproducibility
+1. Capture app screenshots and add reviewer walkthrough to README
+2. Add optional cost tracking field/chart if token usage is available
+3. Evaluate re-ranking and query rewriting for best-practices points
 
 ## Implementation Steps
 1. Foundation: scaffold, config, and starter dataset
@@ -114,3 +118,5 @@ Dashboard charts (target >=5):
 5. LLM layer: Groq explanations with Prompt A/B comparison
 6. Monitoring: Streamlit dashboard with 5 required charts
 7. Reproducibility: uv dependency management, env template, dockerization
+8. Finalization: prompt choice decision + documentation polish
+9. Submission prep: screenshots, final QA, and rubric pass

@@ -1,0 +1,15 @@
+services:
+  lifestyled:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lifestyled-app
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+      - ./data/processed:/app/data/processed
+      - ./reports:/app/reports
+    restart: unless-stopped

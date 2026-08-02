@@ -1,0 +1,127 @@
+[
+  {
+    "id": "Q001",
+    "query": "Need a minimal office outfit for mild weather under 140",
+    "top_item_id": "P001",
+    "prompt_a": "Based on the provided product data and profile, here are 2-3 short bullets explaining fit with style, lifestyle, climate, occasion, and budget:\n\n- The Everyday Linen Shirt from North Thread fits well with the profile's style tag of \"minimal\" and lifestyle tag of \"office\".\n- It is suitable for mild weather, making it a good choice for the profile's climate tag.\n- The price of $49.99 falls within the profile's budget range of $40-$140.",
+    "prompt_b": "```json\n{\n  \"summary\": \"The Everyday Linen Shirt by North Thread is a suitable choice for a minimal office outfit in mild weather.\",\n  \"reasons\": [\n    \"It fits within the budget of $40-$140.\",\n    \"Its style aligns with the 'minimal' preference.\",\n    \"It matches the 'office' lifestyle requirement.\"\n  ],\n  \"cautions\": [\n    \"The product's score is moderate (0.6025), indicating a decent but not exceptional match.\"\n  ]\n}\n```",
+    "manual_scores": {
+      "relevance": {
+        "A": 4,
+        "B": 5
+      },
+      "groundedness": {
+        "A": 5,
+        "B": 5
+      },
+      "personalization": {
+        "A": 4,
+        "B": 4
+      },
+      "clarity": {
+        "A": 4,
+        "B": 5
+      }
+    }
+  },
+  {
+    "id": "Q002",
+    "query": "I want rainy commute outerwear for work under 150",
+    "top_item_id": "P006",
+    "prompt_a": "Based on the provided product data and profile, here are 2-3 short bullets explaining fit with style, lifestyle, climate, occasion, and budget:\n\n- The Travel Capsule Blazer fits the style preference of \"classic\" and matches the lifestyle of commuting and working in an office setting.\n- It is suitable for cool and rainy climates, making it a good choice for rainy commute outerwear.\n- The product is within the budget of $60-$160 and is priced at $149, making it a suitable option.",
+    "prompt_b": "```json\n{\n  \"summary\": \"The Travel Capsule Blazer is a suitable choice for a rainy commute to work.\",\n  \"reasons\": [\n    \"It is within the budget of $160.\",\n    \"Its style matches the user's preference for classic.\",\n    \"It is suitable for an office setting, aligning with the user's lifestyle.\"\n  ],\n  \"cautions\": [\n    \"The product's climate match is only for cool weather, which may not fully cover rainy conditions.\"\n  ]\n}\n```",
+    "manual_scores": {
+      "relevance": {
+        "A": 3,
+        "B": 4
+      },
+      "groundedness": {
+        "A": 2,
+        "B": 4
+      },
+      "personalization": {
+        "A": 4,
+        "B": 4
+      },
+      "clarity": {
+        "A": 4,
+        "B": 5
+      }
+    }
+  },
+  {
+    "id": "Q003",
+    "query": "Weekend travel casual layers for cold weather around 120",
+    "top_item_id": "P018",
+    "prompt_a": "Based on the provided product data and profile, here are 2-3 short bullets explaining fit with style, lifestyle, climate, occasion, and budget:\n\n- The Chunky Knit Cardigan by Fjord Loom fits the profile's style tags (\"casual\", \"cozy\") and lifestyle tags (\"travel\", \"weekend\").\n- It matches the climate tags (\"cold\", \"mild\") for weekend travel in cold weather.\n- The product is within the budget range of $60-$130, with a price of $102.",
+    "prompt_b": "```json\n{\n  \"summary\": \"The Chunky Knit Cardigan is a suitable casual layer for weekend travel in cold weather.\",\n  \"reasons\": [\n    \"It falls within the budget range of $60-$130.\",\n    \"Its style matches the user's preferences for casual and cozy clothing.\",\n    \"It is suitable for weekend travel and cold weather conditions.\"\n  ],\n  \"cautions\": [\n    \"The product's price is at the upper end of the budget range.\",\n    \"The user's climate preferences include 'mild', but the product's climate match only includes 'cold'.\"\n  ]\n}\n```",
+    "manual_scores": {
+      "relevance": {
+        "A": 5,
+        "B": 4
+      },
+      "groundedness": {
+        "A": 5,
+        "B": 3
+      },
+      "personalization": {
+        "A": 5,
+        "B": 4
+      },
+      "clarity": {
+        "A": 4,
+        "B": 5
+      }
+    }
+  },
+  {
+    "id": "Q004",
+    "query": "Need formal office shoes or boots for cool weather",
+    "top_item_id": "P020",
+    "prompt_a": "Based on the provided product data and profile, here are 2-3 short bullets explaining fit with style, lifestyle, climate, occasion, and budget:\n\n- The Block Heel Ankle Boot from Urban Form fits the style preference for classic and elegant, matching the user's profile.\n- It also aligns with the user's lifestyle and occasion requirements, suitable for office wear and formal events.\n- The product is within the user's budget, priced at $135, which falls within the specified range of $80 to $150.",
+    "prompt_b": "```json\n{\n  \"summary\": \"The Block Heel Ankle Boot by Urban Form is a suitable formal office shoe for cool weather.\",\n  \"reasons\": [\n    \"It falls within the budget range of $80-$150.\",\n    \"Its style matches the user's preferences for classic and elegant.\",\n    \"It is suitable for office settings and aligns with the user's lifestyle.\"\n  ],\n  \"cautions\": [\n    \"The product's score is relatively low at 0.5225, indicating some potential drawbacks.\"\n  ]\n}\n```",
+    "manual_scores": {
+      "relevance": {
+        "A": 5,
+        "B": 5
+      },
+      "groundedness": {
+        "A": 5,
+        "B": 4
+      },
+      "personalization": {
+        "A": 5,
+        "B": 4
+      },
+      "clarity": {
+        "A": 4,
+        "B": 5
+      }
+    }
+  },
+  {
+    "id": "Q005",
+    "query": "Looking for breathable warm-weather tops for weekend trips",
+    "top_item_id": "P001",
+    "prompt_a": "Based on the provided product data and profile, here are 2-3 short bullets explaining fit with style, lifestyle, climate, occasion, and budget:\n\n* The Everyday Linen Shirt from North Thread fits well with the profile's style tags (\"casual\", \"minimal\") and climate tags (\"warm\").\n* It's suitable for weekend trips and casual occasions, matching the profile's lifestyle and occasion tags.\n* The price of $49.99 falls within the profile's budget range ($20-$90).",
+    "prompt_b": "```json\n{\n  \"summary\": \"The Everyday Linen Shirt by North Thread is a suitable choice for breathable warm-weather tops.\",\n  \"reasons\": [\n    \"It falls within the budget range of $20-$90.\",\n    \"Its style matches the user's preferences for casual and minimal designs.\",\n    \"It is suitable for warm weather, aligning with the user's climate preferences.\"\n  ],\n  \"cautions\": []\n}\n```",
+    "manual_scores": {
+      "relevance": {
+        "A": 5,
+        "B": 4
+      },
+      "groundedness": {
+        "A": 5,
+        "B": 5
+      },
+      "personalization": {
+        "A": 5,
+        "B": 3
+      },
+      "clarity": {
+        "A": 4,
+        "B": 5
+      }
+    }
+  }
+]

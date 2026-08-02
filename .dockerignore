@@ -1,0 +1,14 @@
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.mypy_cache
+.env
+logs/events.jsonl
+data/processed/chroma
+data/processed/bm25_state.json
+data/processed/tfidf_vectorizer.joblib

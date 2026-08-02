@@ -38,8 +38,8 @@ Implemented so far:
 
 In progress:
 
-- prompt variant scoring (A vs B) on evaluation dimensions
-- docker-compose packaging
+- screenshot capture for reviewer walkthrough
+- optional cost chart and deployment bonus
 
 ## Step-by-Step Implementation Path
 
@@ -75,7 +75,7 @@ In progress:
 7. Reproducibility
 - uv-managed dependencies and lockfile
 - env template
-- docker-compose (next)
+- docker-compose
 
 ## Repository Structure
 
@@ -96,6 +96,7 @@ In progress:
 │   └── build_index.py
 │   └── evaluate_retrieval.py
 ├── reports/
+│   └── prompt_variant_scoring.md
 ├── src/
 │   └── lifestyled/
 │       ├── __init__.py
@@ -105,6 +106,9 @@ In progress:
 │       ├── models.py
 │       └── retrieval.py
 ├── .env.example
+├── .dockerignore
+├── Dockerfile
+├── docker-compose.yml
 ├── requirements.txt
 └── README.md
 ```
@@ -177,6 +181,26 @@ Judging dimensions:
 - groundedness in retrieved products
 - personalization quality
 - clarity
+
+Artifacts:
+
+- prompt generator: scripts/evaluate_prompt_variants.py
+- scoring report generator: scripts/score_prompt_variants.py
+- outputs:
+	- reports/prompt_variant_outputs.json
+	- reports/prompt_variant_scoring.md
+
+Result summary (manual scoring, 1-5 scale):
+
+- Prompt A overall: 4.35
+- Prompt B overall: 4.35
+- Recommendation: tie
+
+Default prompt decision:
+
+- Default is Prompt A for recommendation generation.
+- Rationale: Prompt A performed better on personalization and groundedness, which are prioritized for a profile-aware recommender.
+- Prompt B remains available as an optional format-focused alternative.
 
 ## Interface
 
@@ -252,6 +276,18 @@ Copy .env.example to .env and fill values as needed.
 uv run env PYTHONPATH=src python scripts/evaluate_prompt_variants.py
 ```
 
+### 7) Prompt A/B scoring summary
+
+```bash
+uv run python scripts/score_prompt_variants.py
+```
+
+### 8) Run with Docker Compose
+
+```bash
+docker compose up --build
+```
+
 ## Technology Choices
 
 - Python for implementation
@@ -267,11 +303,12 @@ uv run env PYTHONPATH=src python scripts/evaluate_prompt_variants.py
 - Problem description: this README section "Problem Description"
 - Retrieval flow: section "Retrieval Flow"
 - Retrieval evaluation: section "Evaluation Plan / Retrieval Evaluation" (implemented; reports in reports/)
-- LLM evaluation: section "Evaluation Plan / LLM Evaluation" (in progress)
+- LLM evaluation: section "Evaluation Plan / LLM Evaluation" (implemented; see prompt scoring report)
 - Interface: Streamlit app
 - Ingestion pipeline: script-based ingestion baseline implemented
 - Monitoring: event logging implemented, dashboard in progress
 - Containerization: planned
+- Containerization: implemented (Dockerfile + docker-compose)
 - Reproducibility: setup and run commands included
 
 Best practices goals:
@@ -296,6 +333,12 @@ Notes:
 - Default provider is Groq.
 - Set GROQ_API_KEY in local .env (never commit real keys).
 - Streamlit includes a toggle for LLM explanations and a Prompt A/B selector.
+
+## Containerization
+
+- Dockerfile builds the app image with uv-managed dependencies.
+- docker-compose exposes Streamlit on port 8501.
+- On container start, the index is built and then the Streamlit app launches.
 
 ## Notes
 

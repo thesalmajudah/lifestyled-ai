@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -20,6 +21,11 @@ OUTPUT_PATH = ROOT_DIR / "reports" / "prompt_variant_outputs.json"
 
 
 def main() -> None:
+    if not os.getenv("GROQ_API_KEY", "").strip():
+        raise RuntimeError(
+            "GROQ_API_KEY is not set. Add it to .env and rerun this script."
+        )
+
     with EVAL_PATH.open("r", encoding="utf-8") as f:
         cases = json.load(f)
 
