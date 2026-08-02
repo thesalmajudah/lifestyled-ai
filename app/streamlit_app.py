@@ -415,7 +415,15 @@ def run_recommendations(
             else:
                 st.session_state.last_match_advice_error = "LLM advice helpers are unavailable in this deployment version."
         except Exception as exc:
-            st.session_state.last_match_advice_error = str(exc)
+            # Fall back to a simpler LLM advice prompt if matched-item advice fails.
+            if generate_style_advice is not None:
+                try:
+                    st.session_state.last_match_advice = generate_style_advice(query=query, profile=profile)
+                    st.session_state.last_match_advice_error = ""
+                except Exception as fallback_exc:
+                    st.session_state.last_match_advice_error = str(fallback_exc)
+            else:
+                st.session_state.last_match_advice_error = str(exc)
     else:
         try:
             if generate_style_advice is not None:
@@ -459,8 +467,15 @@ if results and profile:
         st.write(st.session_state.last_match_advice)
         st.divider()
     elif st.session_state.last_match_advice_error:
-        if "GROQ_API_KEY is not set" in st.session_state.last_match_advice_error:
-            st.info("LLM stylist advice unavailable for matched results. Add GROQ_API_KEY to enable it.")
+        advice_error_lower = st.session_state.last_match_advice_error.lower()
+        if (
+            "groq_api_key is not set" in advice_error_lower
+            or "api key" in advice_error_lower
+            or "authentication" in advice_error_lower
+            or "unauthorized" in advice_error_lower
+            or "401" in advice_error_lower
+        ):
+            st.info("LLM stylist advice unavailable for matched results. Configure GROQ_API_KEY in Streamlit Cloud Secrets.")
         else:
             st.info("LLM stylist advice is temporarily unavailable for matched results.")
 
