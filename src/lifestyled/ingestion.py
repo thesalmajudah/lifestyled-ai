@@ -3,10 +3,11 @@ from pathlib import Path
 from typing import Dict, List
 
 import chromadb
+import joblib
 import pandas as pd
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 
-from .config import BM25_STATE_PATH, CHROMA_DIR, RAW_DATA_PATH
+from .config import BM25_STATE_PATH, CHROMA_DIR, RAW_DATA_PATH, VECTORIZER_PATH
 
 
 def _split_tags(value: str) -> List[str]:
@@ -51,7 +52,6 @@ def build_index(
     chroma_dir: Path = CHROMA_DIR,
     bm25_state_path: Path = BM25_STATE_PATH,
     collection_name: str = "products",
-    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2",
 ) -> None:
     df = pd.read_csv(data_path)
     if df.empty:
@@ -77,8 +77,14 @@ def build_index(
             bm25_tokens.extend(_split_tags(row[tag_field]))
         tokenized_corpus.append(bm25_tokens)
 
-    model = SentenceTransformer(embedding_model)
-    embeddings = model.encode(documents, convert_to_numpy=True).tolist()
+    vectorizer = TfidfVectorizer(
+        lowercase=True,
+        ngram_range=(1, 2),
+        min_df=1,
+        max_features=1024,
+    )
+    tfidf_matrix = vectorizer.fit_transform(documents)
+    embeddings = tfidf_matrix.toarray().tolist()
 
     chroma_dir.mkdir(parents=True, exist_ok=True)
     client = chromadb.PersistentClient(path=str(chroma_dir))
@@ -108,6 +114,8 @@ def build_index(
             ensure_ascii=True,
             indent=2,
         )
+
+    joblib.dump(vectorizer, VECTORIZER_PATH)
 
 
 def load_catalog(data_path: Path = RAW_DATA_PATH) -> pd.DataFrame:

@@ -4,10 +4,10 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 import chromadb
+import joblib
 from rank_bm25 import BM25Okapi
-from sentence_transformers import SentenceTransformer
 
-from .config import BM25_STATE_PATH, CHROMA_DIR
+from .config import BM25_STATE_PATH, CHROMA_DIR, VECTORIZER_PATH
 from .models import SearchResult, UserProfile
 
 
@@ -17,11 +17,15 @@ class ProductRetriever:
         chroma_dir: Path = CHROMA_DIR,
         bm25_state_path: Path = BM25_STATE_PATH,
         collection_name: str = "products",
-        embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2",
     ) -> None:
-        self.embedding_model = SentenceTransformer(embedding_model)
         self.client = chromadb.PersistentClient(path=str(chroma_dir))
         self.collection = self.client.get_or_create_collection(name=collection_name)
+
+        if not VECTORIZER_PATH.exists():
+            raise FileNotFoundError(
+                f"Vectorizer file not found at {VECTORIZER_PATH}. Run ingestion first."
+            )
+        self.vectorizer = joblib.load(VECTORIZER_PATH)
 
         if not bm25_state_path.exists():
             raise FileNotFoundError(
@@ -97,7 +101,7 @@ class ProductRetriever:
         if retrieval_mode not in {"vector", "hybrid"}:
             raise ValueError("retrieval_mode must be 'vector' or 'hybrid'")
 
-        query_embedding = self.embedding_model.encode([query], convert_to_numpy=True).tolist()[0]
+        query_embedding = self.vectorizer.transform([query]).toarray().tolist()[0]
         vector_hits = self.collection.query(
             query_embeddings=[query_embedding],
             n_results=min(20, len(self.ids)),
