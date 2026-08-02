@@ -17,10 +17,15 @@ load_dotenv(ROOT_DIR / ".env")
 
 from lifestyled.config import EVENT_LOG_PATH
 from lifestyled.agentic import AgenticRecommender
-from lifestyled.explanations import generate_explanation
+from lifestyled.explanations import generate_explanation, generate_match_advice, generate_style_advice
 from lifestyled.ingestion import build_index
 from lifestyled.models import UserProfile
 from lifestyled.retrieval import ProductRetriever
+
+DEFAULT_SEARCH_MODE = "hybrid"
+DEFAULT_AGENTIC_LOOP = True
+DEFAULT_ITEM_EXPLANATIONS = False
+DEFAULT_PROMPT_VARIANT = "A"
 
 st.set_page_config(page_title="LifeStyled", page_icon="👗", layout="wide")
 
@@ -178,15 +183,15 @@ if "last_query" not in st.session_state:
 if "last_profile" not in st.session_state:
     st.session_state.last_profile = None
 if "last_mode" not in st.session_state:
-    st.session_state.last_mode = "hybrid"
+    st.session_state.last_mode = DEFAULT_SEARCH_MODE
 if "last_latency_ms" not in st.session_state:
     st.session_state.last_latency_ms = None
 if "last_prompt_variant" not in st.session_state:
-    st.session_state.last_prompt_variant = "A"
+    st.session_state.last_prompt_variant = DEFAULT_PROMPT_VARIANT
 if "last_llm_enabled" not in st.session_state:
-    st.session_state.last_llm_enabled = False
+    st.session_state.last_llm_enabled = DEFAULT_ITEM_EXPLANATIONS
 if "last_agentic_enabled" not in st.session_state:
-    st.session_state.last_agentic_enabled = True
+    st.session_state.last_agentic_enabled = DEFAULT_AGENTIC_LOOP
 if "last_agent_steps" not in st.session_state:
     st.session_state.last_agent_steps = []
 if "last_agent_stop_reason" not in st.session_state:
@@ -197,16 +202,6 @@ if "effective_query" not in st.session_state:
     st.session_state.effective_query = ""
 if "query_draft" not in st.session_state:
     st.session_state.query_draft = ""
-if "mode_pref" not in st.session_state:
-    st.session_state.mode_pref = None
-if "agentic_pref" not in st.session_state:
-    st.session_state.agentic_pref = False
-if "llm_pref" not in st.session_state:
-    st.session_state.llm_pref = False
-if "prompt_pref" not in st.session_state:
-    st.session_state.prompt_pref = None
-if "show_agent_steps" not in st.session_state:
-    st.session_state.show_agent_steps = False
 if "trigger_search" not in st.session_state:
     st.session_state.trigger_search = False
 if "queued_query" not in st.session_state:
@@ -225,26 +220,29 @@ if "profile_size" not in st.session_state:
     st.session_state.profile_size = None
 if "reset_requested" not in st.session_state:
     st.session_state.reset_requested = False
+if "last_no_match_advice" not in st.session_state:
+    st.session_state.last_no_match_advice = ""
+if "last_no_match_advice_error" not in st.session_state:
+    st.session_state.last_no_match_advice_error = ""
+if "last_match_advice" not in st.session_state:
+    st.session_state.last_match_advice = ""
+if "last_match_advice_error" not in st.session_state:
+    st.session_state.last_match_advice_error = ""
 
 if st.session_state.reset_requested:
     st.session_state.last_results = []
     st.session_state.last_query = ""
     st.session_state.last_profile = None
-    st.session_state.last_mode = "hybrid"
+    st.session_state.last_mode = DEFAULT_SEARCH_MODE
     st.session_state.last_latency_ms = None
-    st.session_state.last_prompt_variant = "A"
-    st.session_state.last_llm_enabled = False
-    st.session_state.last_agentic_enabled = True
+    st.session_state.last_prompt_variant = DEFAULT_PROMPT_VARIANT
+    st.session_state.last_llm_enabled = DEFAULT_ITEM_EXPLANATIONS
+    st.session_state.last_agentic_enabled = DEFAULT_AGENTIC_LOOP
     st.session_state.last_agent_steps = []
     st.session_state.last_agent_stop_reason = ""
     st.session_state.last_agent_quality = None
     st.session_state.effective_query = ""
     st.session_state.query_draft = ""
-    st.session_state.mode_pref = None
-    st.session_state.agentic_pref = False
-    st.session_state.llm_pref = False
-    st.session_state.prompt_pref = None
-    st.session_state.show_agent_steps = False
     st.session_state.trigger_search = False
     st.session_state.queued_query = ""
     st.session_state.profile_style_tags = []
@@ -254,6 +252,10 @@ if st.session_state.reset_requested:
     st.session_state.profile_budget_range = (5, 600)
     st.session_state.profile_size = None
     st.session_state.pop("feedback_choice", None)
+    st.session_state.last_no_match_advice = ""
+    st.session_state.last_no_match_advice_error = ""
+    st.session_state.last_match_advice = ""
+    st.session_state.last_match_advice_error = ""
     st.session_state.reset_requested = False
 
 landing_prompts = [
@@ -261,12 +263,6 @@ landing_prompts = [
     "Looking for vacation swimwear for warm weather around 130",
     "Need polished workwear for office commute",
 ]
-
-
-def options_dropdown(label: str):
-    if hasattr(st, "popover"):
-        return st.popover(label)
-    return st.expander(label, expanded=False)
 
 
 def queue_search() -> None:
@@ -298,7 +294,7 @@ with st.sidebar:
         ["work", "casual", "formal", "dinner", "active", "travel", "brunch", "special occasion"],
         key="profile_occasion_tags",
     )
-    budget_min, budget_max = st.slider("Budget range", 5, 600, (5, 600), key="profile_budget_range")
+    budget_min, budget_max = st.slider("Budget range", 5, 600, key="profile_budget_range")
     size = st.selectbox(
         "Size",
         [
@@ -327,7 +323,7 @@ with st.sidebar:
     st.button(
         "Clear conversation",
         key="clear_conversation_btn",
-        help="Reset query, profile, tuning options, and results",
+        help="Reset query, profile, and results",
         use_container_width=True,
         on_click=clear_conversation,
     )
@@ -335,17 +331,13 @@ with st.sidebar:
 
 def run_recommendations(
     query: str,
-    mode: str | None,
+    mode: str,
     use_agentic_loop: bool,
     use_llm_explanations: bool,
-    prompt_variant: str | None,
+    prompt_variant: str,
 ) -> None:
     if not query.strip():
         st.warning("Please tell us what you are shopping for before running recommendations.")
-        return
-    mode = mode or "hybrid"
-    if use_llm_explanations and not prompt_variant:
-        st.warning("Please choose an explanation style in Tune recommendations.")
         return
     if size is None:
         st.warning("Please select your size for accurate recommendations.")
@@ -401,6 +393,26 @@ def run_recommendations(
     st.session_state.last_prompt_variant = prompt_variant
     st.session_state.last_llm_enabled = use_llm_explanations
     st.session_state.last_agentic_enabled = use_agentic_loop
+
+    st.session_state.last_no_match_advice = ""
+    st.session_state.last_no_match_advice_error = ""
+    st.session_state.last_match_advice = ""
+    st.session_state.last_match_advice_error = ""
+    if run_results:
+        try:
+            st.session_state.last_match_advice = generate_match_advice(
+                query=query,
+                profile=profile,
+                items=run_results,
+            )
+        except Exception as exc:
+            st.session_state.last_match_advice_error = str(exc)
+    else:
+        try:
+            st.session_state.last_no_match_advice = generate_style_advice(query=query, profile=profile)
+        except Exception as exc:
+            st.session_state.last_no_match_advice_error = str(exc)
+
     st.rerun()
 
 results = st.session_state.last_results
@@ -422,42 +434,6 @@ if not results:
             ):
                 st.session_state.trigger_search = True
                 st.rerun()
-        with options_dropdown("Tune recommendations"):
-            st.selectbox(
-                "Search mode",
-                ["hybrid", "vector"],
-                key="mode_pref",
-                index=None,
-                placeholder="Choose search mode",
-                help="Hybrid combines text and semantic matching. Vector uses semantic matching only.",
-            )
-            st.checkbox(
-                "Use smarter search retry (beta)",
-                key="agentic_pref",
-                help="If first results look weak, the app refines your query once and reranks results.",
-            )
-            st.checkbox(
-                "Add AI style explanations",
-                key="llm_pref",
-                help="Adds short AI-generated reasons for each recommendation.",
-            )
-            if st.session_state.llm_pref:
-                st.selectbox(
-                    "Explanation style",
-                    ["A", "B"],
-                    key="prompt_pref",
-                    index=None,
-                    placeholder="Choose explanation style",
-                    help="Style A is concise bullets. Style B is structured JSON-like reasoning.",
-                )
-                st.caption("Style A: short, readable shopper guidance. Style B: structured, evidence-like reasoning format.")
-            else:
-                st.session_state.prompt_pref = None
-            st.checkbox(
-                "Show agent diagnostics",
-                key="show_agent_steps",
-                help="Shows stop reason, quality score, and step-by-step agent trace after running recommendations.",
-            )
         for idx, prompt in enumerate(landing_prompts):
             if st.button(prompt, key=f"landing_prompt_{idx}"):
                 st.session_state.queued_query = prompt
@@ -465,15 +441,16 @@ if not results:
                 st.rerun()
 
 if results and profile:
-    if st.session_state.last_agentic_enabled and st.session_state.show_agent_steps:
-        st.caption(
-            "Agentic loop: "
-            f"stop_reason={st.session_state.last_agent_stop_reason}; "
-            f"quality={st.session_state.last_agent_quality}; "
-            f"effective_query={st.session_state.effective_query}"
-        )
-        with st.expander("Agent steps"):
-            st.json(st.session_state.last_agent_steps)
+    if st.session_state.last_match_advice:
+        st.markdown("### Stylist advice")
+        st.caption("LLM-generated guidance based on your query, profile, and top matched items.")
+        st.write(st.session_state.last_match_advice)
+        st.divider()
+    elif st.session_state.last_match_advice_error:
+        if "GROQ_API_KEY is not set" in st.session_state.last_match_advice_error:
+            st.info("LLM stylist advice unavailable for matched results. Add GROQ_API_KEY to enable it.")
+        else:
+            st.info("LLM stylist advice is temporarily unavailable for matched results.")
 
     allow_llm = st.session_state.last_llm_enabled and bool(os.getenv("GROQ_API_KEY", "").strip())
     if st.session_state.last_llm_enabled and not allow_llm:
@@ -532,6 +509,15 @@ if results and profile:
         st.success("Feedback saved")
 elif st.session_state.last_query:
     st.warning("No matching items found. Try widening budget, changing size, or adjusting tags.")
+    if st.session_state.last_no_match_advice:
+        st.markdown("### Stylist advice")
+        st.caption("General guidance based on your query and profile when exact catalog matches are unavailable.")
+        st.write(st.session_state.last_no_match_advice)
+    elif st.session_state.last_no_match_advice_error:
+        if "GROQ_API_KEY is not set" in st.session_state.last_no_match_advice_error:
+            st.info("LLM stylist advice unavailable. Add GROQ_API_KEY to enable dynamic fallback guidance.")
+        else:
+            st.info("LLM stylist advice is temporarily unavailable. Please try again.")
 
 if results:
     st.divider()
@@ -548,50 +534,15 @@ if results:
         ):
             st.session_state.trigger_search = True
             st.rerun()
-    with options_dropdown("Tune recommendations"):
-        st.selectbox(
-            "Search mode",
-            ["hybrid", "vector"],
-            key="mode_pref",
-            index=None,
-            placeholder="Choose search mode",
-            help="Hybrid combines text and semantic matching. Vector uses semantic matching only.",
-        )
-        st.checkbox(
-            "Use smarter search retry (beta)",
-            key="agentic_pref",
-            help="If first results look weak, the app refines your query once and reranks results.",
-        )
-        st.checkbox(
-            "Add AI style explanations",
-            key="llm_pref",
-            help="Adds short AI-generated reasons for each recommendation.",
-        )
-        if st.session_state.llm_pref:
-            st.selectbox(
-                "Explanation style",
-                ["A", "B"],
-                key="prompt_pref",
-                index=None,
-                placeholder="Choose explanation style",
-                help="Style A is concise bullets. Style B is structured JSON-like reasoning.",
-            )
-            st.caption("Style A: short, readable shopper guidance. Style B: structured, evidence-like reasoning format.")
-        else:
-            st.session_state.prompt_pref = None
-        st.checkbox(
-            "Show agent diagnostics",
-            key="show_agent_steps",
-            help="Shows stop reason, quality score, and step-by-step agent trace after running recommendations.",
-        )
+
 if st.session_state.trigger_search:
     st.session_state.trigger_search = False
     query_to_run = st.session_state.queued_query or st.session_state.query_draft
     st.session_state.queued_query = ""
     run_recommendations(
         query=query_to_run,
-        mode=st.session_state.mode_pref,
-        use_agentic_loop=st.session_state.agentic_pref,
-        use_llm_explanations=st.session_state.llm_pref,
-        prompt_variant=st.session_state.prompt_pref,
+        mode=DEFAULT_SEARCH_MODE,
+        use_agentic_loop=DEFAULT_AGENTIC_LOOP,
+        use_llm_explanations=DEFAULT_ITEM_EXPLANATIONS,
+        prompt_variant=DEFAULT_PROMPT_VARIANT,
     )

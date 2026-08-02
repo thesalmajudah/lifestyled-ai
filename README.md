@@ -52,7 +52,7 @@ LifeStyled is a profile-aware fashion assistant that retrieves relevant products
 
 - Profile-aware retrieval with vector and hybrid search
 - Optional query rewrite + diversity rerank loop
-- Streamlit app with recommendation flow and feedback logging
+- Streamlit app with a simplified end-user recommendation flow and feedback logging
 - Monitoring dashboard page with core charts and query table
 - Retrieval and prompt evaluation scripts
 
@@ -166,6 +166,13 @@ Dataset compliance:
 4. Re-rank by profile fit.
 5. Return top recommendations with reasons.
 
+Runtime defaults used in the app are selected from offline experiments:
+
+- Retrieval mode shown to end users: `hybrid` (default in production UI)
+- Explanation style shown to end users: internal default selected via prompt-variant evaluation
+
+The `Search mode` and prompt-variant controls are evaluation/tuning knobs and are not presented as end-user controls in the primary UI.
+
 ## Evaluation Plan
 
 ### Retrieval Evaluation
@@ -191,6 +198,8 @@ Artifacts:
 - `reports/prompt_variant_outputs.json`
 - `reports/prompt_variant_scoring.md`
 
+These scripts are used offline to compare prompt behavior and choose app defaults. They are not intended as user-facing runtime controls.
+
 ## Offline Evaluation Results
 
 Retrieval benchmark (k = 5), from `reports/retrieval_eval.md`:
@@ -203,6 +212,8 @@ Retrieval benchmark (k = 5), from `reports/retrieval_eval.md`:
 | Hybrid Search (Vector + BM25) | 1.0000 | 0.5347 | Combines semantic and keyword matching, improving relevance while keeping perfect hit rate. |
 
 Decision: Hybrid is the default retrieval mode because it gives higher relevance at the same hit rate.
+
+Product decision: this retrieval choice is applied as an internal app default to reduce UI complexity for end users.
 
 Run retrieval benchmark locally:
 
