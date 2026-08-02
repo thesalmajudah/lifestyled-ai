@@ -95,7 +95,11 @@ In progress:
 ├── scripts/
 │   └── build_index.py
 │   └── evaluate_retrieval.py
+│   └── evaluate_prompt_variants.py
+│   └── score_prompt_variants.py
 ├── reports/
+│   └── retrieval_eval.md
+│   └── prompt_variant_outputs.json
 │   └── prompt_variant_scoring.md
 ├── src/
 │   └── lifestyled/
@@ -288,6 +292,43 @@ uv run python scripts/score_prompt_variants.py
 docker compose up --build
 ```
 
+## Reviewer Quickstart
+
+1. Clone the repository and move into it.
+2. Create local config file and set keys.
+3. Run dependency sync.
+4. Build index and run app.
+5. Run retrieval and LLM evaluation scripts.
+
+Commands:
+
+```bash
+cp .env.example .env
+# add GROQ_API_KEY in .env if running LLM explanation evaluation
+
+uv sync
+uv run env PYTHONPATH=src python scripts/build_index.py
+uv run env PYTHONPATH=src streamlit run app/streamlit_app.py
+```
+
+Evaluation commands:
+
+```bash
+uv run env PYTHONPATH=src python scripts/evaluate_retrieval.py
+uv run env PYTHONPATH=src python scripts/evaluate_prompt_variants.py
+uv run python scripts/score_prompt_variants.py
+```
+
+## Screenshots Checklist
+
+Add these images before final submission and link them here:
+
+- [ ] main recommendation page after query
+- [ ] recommendation cards with reasons
+- [ ] monitoring page with charts
+- [ ] prompt A vs B output example
+- [ ] retrieval evaluation report snippet
+
 ## Technology Choices
 
 - Python for implementation
@@ -307,9 +348,26 @@ docker compose up --build
 - Interface: Streamlit app
 - Ingestion pipeline: script-based ingestion baseline implemented
 - Monitoring: event logging implemented, dashboard in progress
-- Containerization: planned
 - Containerization: implemented (Dockerfile + docker-compose)
 - Reproducibility: setup and run commands included
+
+## Rubric Checklist (Current)
+
+- [x] Problem description
+- [x] Retrieval flow (knowledge base + LLM flow)
+- [x] Retrieval evaluation (vector vs hybrid)
+- [x] LLM evaluation (Prompt A vs B with scoring report)
+- [x] Interface (Streamlit UI)
+- [x] Ingestion pipeline (scripted baseline)
+- [x] Monitoring (feedback + dashboard with >=5 charts)
+- [x] Containerization (Dockerfile + docker-compose)
+- [x] Reproducibility (uv setup + commands + env template)
+
+Best-practice extras:
+
+- [x] Hybrid retrieval
+- [ ] Re-ranking
+- [ ] Query rewriting
 
 Best practices goals:
 
