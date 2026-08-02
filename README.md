@@ -29,12 +29,10 @@
 11. [Monitoring](#monitoring)
 12. [Reproducibility](#reproducibility)
 13. [Reviewer Quickstart](#reviewer-quickstart)
-14. [Technology Choices](#technology-choices)
-15. [Evaluation Criteria Mapping (Zoomcamp)](#evaluation-criteria-mapping-zoomcamp)
-16. [Evaluation Criteria Checklist](#evaluation-criteria-checklist)
-17. [Rubric Checklist (Current)](#rubric-checklist-current)
-18. [Containerization](#containerization)
-19. [Notes](#notes)
+14. [Evaluation Criteria Mapping (Zoomcamp)](#evaluation-criteria-mapping-zoomcamp)
+15. [Evaluation Criteria Checklist](#evaluation-criteria-checklist)
+16. [Rubric Checklist (Current)](#rubric-checklist-current)
+17. [Containerization](#containerization)
 
 
 ## Problem Description
@@ -116,17 +114,39 @@ flowchart TD
 .
 ├── app/
 │   ├── streamlit_app.py
-│   └── pages/01_monitoring.py
+│   └── pages/
+│       └── 01_monitoring.py
 ├── data/
-│   ├── raw/products_seed.csv
-│   └── eval/validation_queries.json
+│   ├── raw/
+│   │   └── products_seed.csv
+│   ├── eval/
+│   │   └── validation_queries.json
+│   └── processed/
 ├── logs/
+│   └── events.jsonl
 ├── reports/
+│   ├── retrieval_eval.json
+│   ├── retrieval_eval.md
+│   ├── prompt_variant_outputs.json
+│   └── prompt_variant_scoring.md
 ├── scripts/
-├── src/lifestyled/
+│   ├── build_index.py
+│   ├── evaluate_retrieval.py
+│   ├── evaluate_prompt_variants.py
+│   └── score_prompt_variants.py
+├── src/
+│   └── lifestyled/
+│       ├── agentic.py
+│       ├── config.py
+│       ├── explanations.py
+│       ├── ingestion.py
+│       ├── models.py
+│       └── retrieval.py
 ├── .env.example
 ├── Dockerfile
 ├── docker-compose.yml
+├── pyproject.toml
+├── uv.lock
 └── README.md
 ```
 
@@ -173,17 +193,37 @@ Artifacts:
 
 ## Offline Evaluation Results
 
-Retrieval (k=5), from `reports/retrieval_eval.md`:
+Retrieval benchmark (k = 5), from `reports/retrieval_eval.md`:
 
-- Vector: hit-rate@5 = 1.0000, relevance@5 = 0.4792
-- Hybrid: hit-rate@5 = 1.0000, relevance@5 = 0.5347
-- Decision: hybrid is the default retrieval mode because it has higher relevance at the same hit-rate.
+### Benchmark Results Table
 
-LLM output scoring, from `reports/prompt_variant_scoring.md`:
+| Retrieval Strategy | Avg Hit Rate@5 | Avg Relevance@5 | Description |
+|---|---:|---:|---|
+| Vector Search Only | 1.0000 | 0.4792 | Captures semantic similarity, but with lower final relevance than hybrid on the validation set. |
+| Hybrid Search (Vector + BM25) | 1.0000 | 0.5347 | Combines semantic and keyword matching, improving relevance while keeping perfect hit rate. |
 
-- Current scoring coverage: 0/40
-- Recommendation status: insufficient_data
-- Next step: fill manual_scores in `reports/prompt_variant_outputs.json` and rerun `scripts/score_prompt_variants.py`.
+Decision: Hybrid is the default retrieval mode because it gives higher relevance at the same hit rate.
+
+Run retrieval benchmark locally:
+
+```bash
+uv run env PYTHONPATH=src python scripts/evaluate_retrieval.py
+```
+
+LLM output evaluation status, from `reports/prompt_variant_scoring.md`:
+
+| Metric | Value |
+|---|---|
+| Scoring coverage | 0/40 |
+| Recommendation status | insufficient_data |
+| Next step | Fill `manual_scores` in `reports/prompt_variant_outputs.json` and rerun `scripts/score_prompt_variants.py`. |
+
+Run LLM evaluation locally:
+
+```bash
+uv run env PYTHONPATH=src python scripts/evaluate_prompt_variants.py
+uv run python scripts/score_prompt_variants.py
+```
 
 Full artifacts:
 
@@ -225,25 +265,21 @@ uv run env PYTHONPATH=src python scripts/build_index.py
 uv run env PYTHONPATH=src streamlit run app/streamlit_app.py
 ```
 
-## Technology Choices
-
-- Python 3.12+
-- Streamlit
-- ChromaDB
-- BM25 (`rank-bm25`)
-- scikit-learn TF-IDF
-- Groq (optional)
-
 ## Evaluation Criteria Mapping (Zoomcamp)
 
-- Problem description: this README
-- Retrieval flow: `src/lifestyled/retrieval.py`
-- Retrieval evaluation: `scripts/evaluate_retrieval.py`, `reports/retrieval_eval.md`
-- LLM evaluation: `scripts/evaluate_prompt_variants.py`, `reports/prompt_variant_scoring.md`
-- Interface: `app/streamlit_app.py`
-- Ingestion: `scripts/build_index.py`, `src/lifestyled/ingestion.py`
-- Monitoring: `app/pages/01_monitoring.py`
-- Containerization: `Dockerfile`, `docker-compose.yml`
+This project satisfies the Zoomcamp evaluation criteria as mapped below.
+
+| Rubric Criteria | Project Feature and Implementation File |
+|---|---|
+| Problem description | Clear problem statement and scope in this README. |
+| Retrieval flow | Profile-aware vector + BM25 retrieval and ranking in [src/lifestyled/retrieval.py](src/lifestyled/retrieval.py) with optional orchestration in [src/lifestyled/agentic.py](src/lifestyled/agentic.py). |
+| Retrieval evaluation | Benchmark script in [scripts/evaluate_retrieval.py](scripts/evaluate_retrieval.py) with reported metrics in [reports/retrieval_eval.md](reports/retrieval_eval.md) and [reports/retrieval_eval.json](reports/retrieval_eval.json). |
+| LLM evaluation | Prompt variant generation and scoring via [scripts/evaluate_prompt_variants.py](scripts/evaluate_prompt_variants.py) and [scripts/score_prompt_variants.py](scripts/score_prompt_variants.py), results in [reports/prompt_variant_scoring.md](reports/prompt_variant_scoring.md). |
+| Interface | Interactive Streamlit UI in [app/streamlit_app.py](app/streamlit_app.py). |
+| Ingestion pipeline | Index build pipeline in [scripts/build_index.py](scripts/build_index.py) and [src/lifestyled/ingestion.py](src/lifestyled/ingestion.py). |
+| Monitoring | Feedback logging in [app/streamlit_app.py](app/streamlit_app.py) and dashboard charts/table in [app/pages/01_monitoring.py](app/pages/01_monitoring.py). |
+| Containerization | Container setup in [Dockerfile](Dockerfile) and [docker-compose.yml](docker-compose.yml). |
+| Reproducibility | Pinned dependencies in [pyproject.toml](pyproject.toml) and [uv.lock](uv.lock), plus run steps in this README. |
 
 ## Evaluation Criteria Checklist
 
@@ -268,8 +304,3 @@ uv run env PYTHONPATH=src streamlit run app/streamlit_app.py
 ```bash
 docker compose up --build
 ```
-
-## Notes
-
-- Live app is deployed at https://lifestyled-ai.streamlit.app
-- Monitoring includes user feedback plus a dashboard with 5+ charts and a query table.
