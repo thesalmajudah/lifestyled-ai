@@ -15,6 +15,16 @@ if str(SRC_DIR) not in sys.path:
 
 load_dotenv(ROOT_DIR / ".env")
 
+# In Streamlit Cloud, users often configure keys in Secrets instead of .env.
+try:
+    if not os.getenv("GROQ_API_KEY") and "GROQ_API_KEY" in st.secrets:
+        os.environ["GROQ_API_KEY"] = str(st.secrets["GROQ_API_KEY"])
+    if not os.getenv("GROQ_MODEL") and "GROQ_MODEL" in st.secrets:
+        os.environ["GROQ_MODEL"] = str(st.secrets["GROQ_MODEL"])
+except Exception:
+    # Ignore secrets access errors and fall back to env/.env behavior.
+    pass
+
 from lifestyled.config import EVENT_LOG_PATH
 from lifestyled.agentic import AgenticRecommender
 from lifestyled import explanations as explanations_module
@@ -476,6 +486,10 @@ if results and profile:
             or "401" in advice_error_lower
         ):
             st.info("LLM stylist advice unavailable for matched results. Configure GROQ_API_KEY in Streamlit Cloud Secrets.")
+        elif "429" in advice_error_lower or "rate" in advice_error_lower:
+            st.info("LLM stylist advice is rate-limited right now. Please retry in a few seconds.")
+        elif "model" in advice_error_lower or "not found" in advice_error_lower:
+            st.info("LLM stylist advice model is unavailable in this environment. Verify GROQ_MODEL in Secrets.")
         else:
             st.info("LLM stylist advice is temporarily unavailable for matched results.")
 
