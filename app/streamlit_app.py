@@ -17,15 +17,14 @@ load_dotenv(ROOT_DIR / ".env")
 
 from lifestyled.config import EVENT_LOG_PATH
 from lifestyled.agentic import AgenticRecommender
-from lifestyled.explanations import generate_explanation, generate_style_advice
-
-try:
-    from lifestyled.explanations import generate_match_advice
-except ImportError:
-    generate_match_advice = None
+from lifestyled import explanations as explanations_module
 from lifestyled.ingestion import build_index
 from lifestyled.models import UserProfile
 from lifestyled.retrieval import ProductRetriever
+
+generate_explanation = getattr(explanations_module, "generate_explanation", None)
+generate_style_advice = getattr(explanations_module, "generate_style_advice", None)
+generate_match_advice = getattr(explanations_module, "generate_match_advice", None)
 
 DEFAULT_SEARCH_MODE = "hybrid"
 DEFAULT_AGENTIC_LOOP = True
@@ -411,13 +410,18 @@ def run_recommendations(
                     profile=profile,
                     items=run_results,
                 )
-            else:
+            elif generate_style_advice is not None:
                 st.session_state.last_match_advice = generate_style_advice(query=query, profile=profile)
+            else:
+                st.session_state.last_match_advice_error = "LLM advice helpers are unavailable in this deployment version."
         except Exception as exc:
             st.session_state.last_match_advice_error = str(exc)
     else:
         try:
-            st.session_state.last_no_match_advice = generate_style_advice(query=query, profile=profile)
+            if generate_style_advice is not None:
+                st.session_state.last_no_match_advice = generate_style_advice(query=query, profile=profile)
+            else:
+                st.session_state.last_no_match_advice_error = "LLM advice helpers are unavailable in this deployment version."
         except Exception as exc:
             st.session_state.last_no_match_advice_error = str(exc)
 
@@ -460,9 +464,16 @@ if results and profile:
         else:
             st.info("LLM stylist advice is temporarily unavailable for matched results.")
 
-    allow_llm = st.session_state.last_llm_enabled and bool(os.getenv("GROQ_API_KEY", "").strip())
+    allow_llm = (
+        st.session_state.last_llm_enabled
+        and bool(os.getenv("GROQ_API_KEY", "").strip())
+        and generate_explanation is not None
+    )
     if st.session_state.last_llm_enabled and not allow_llm:
-        st.info("GROQ_API_KEY missing. Showing retrieval reasons only.")
+        if generate_explanation is None:
+            st.info("LLM explanation helper unavailable in this deployment version. Showing retrieval reasons only.")
+        else:
+            st.info("GROQ_API_KEY missing. Showing retrieval reasons only.")
 
     for idx, item in enumerate(results, start=1):
         st.subheader(f"{idx}. {item.title} (${item.price:.2f})")
