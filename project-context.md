@@ -104,6 +104,7 @@ Dashboard charts (target >=5):
 - Prompt variant scoring script added
 - Prompt A/B manual scoring completed
 - Default prompt selected: A (tie-break by personalization + groundedness)
+- Retrieval tuning validated: hybrid relevance@5 improved to 0.5347 (hit-rate@5 remains 1.0)
 
 ## Next 3 Tasks
 1. Capture app screenshots and add reviewer walkthrough to README

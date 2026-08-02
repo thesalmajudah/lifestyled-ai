@@ -241,6 +241,15 @@ Artifacts:
 	- reports/retrieval_eval.json
 	- reports/retrieval_eval.md
 
+Latest run summary (k=5):
+
+- vector: hit-rate@5 = 1.0000, relevance@5 = 0.4792
+- hybrid: hit-rate@5 = 1.0000, relevance@5 = 0.5347
+
+Current retrieval default:
+
+- Hybrid retrieval is the default and best-performing evaluated mode on the validation set.
+
 ### LLM Evaluation
 
 Compare Prompt A vs Prompt B for generated explanations.

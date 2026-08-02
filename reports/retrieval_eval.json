@@ -2,54 +2,55 @@
   "vector": {
     "mode": "vector",
     "k": 5,
-    "avg_hit_rate_at_k": 0.8,
-    "avg_relevance_at_k": 0.6333,
+    "avg_hit_rate_at_k": 1.0,
+    "avg_relevance_at_k": 0.4792,
     "cases": [
       {
         "id": "Q001",
         "query": "Need a minimal office outfit for mild weather under 140",
         "predicted_ids": [
-          "P001",
-          "P005",
-          "P010",
-          "P008",
-          "P017"
+          "P169",
+          "P057",
+          "P165",
+          "P080",
+          "P202"
         ],
         "expected_ids": [
-          "P002",
-          "P006",
           "P010",
-          "P017"
+          "P493",
+          "P494",
+          "P057"
         ],
         "hit_rate_at_k": 1.0,
-        "relevance_at_k": 0.5
+        "relevance_at_k": 0.25
       },
       {
         "id": "Q002",
-        "query": "I want rainy commute outerwear for work under 150",
+        "query": "I want rainy commute outerwear for work under 180",
         "predicted_ids": [
-          "P005",
-          "P006",
-          "P010",
-          "P008",
-          "P017"
+          "P003",
+          "P238",
+          "P248",
+          "P244",
+          "P237"
         ],
         "expected_ids": [
           "P003",
-          "P015"
+          "P006",
+          "P495"
         ],
-        "hit_rate_at_k": 0.0,
-        "relevance_at_k": 0.0
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.3333
       },
       {
         "id": "Q003",
         "query": "Weekend travel casual layers for cold weather around 120",
         "predicted_ids": [
-          "P018",
+          "P050",
           "P007",
-          "P009",
-          "P005",
-          "P015"
+          "P433",
+          "P441",
+          "P403"
         ],
         "expected_ids": [
           "P009",
@@ -57,34 +58,165 @@
           "P007"
         ],
         "hit_rate_at_k": 1.0,
-        "relevance_at_k": 1.0
+        "relevance_at_k": 0.3333
       },
       {
         "id": "Q004",
         "query": "Need formal office shoes or boots for cool weather",
         "predicted_ids": [
-          "P020"
+          "P020",
+          "P292",
+          "P288",
+          "P309",
+          "P280"
         ],
         "expected_ids": [
-          "P020"
+          "P020",
+          "P274"
         ],
         "hit_rate_at_k": 1.0,
-        "relevance_at_k": 1.0
+        "relevance_at_k": 0.5
       },
       {
         "id": "Q005",
         "query": "Looking for breathable warm-weather tops for weekend trips",
         "predicted_ids": [
-          "P016",
+          "P174",
           "P001",
-          "P007",
-          "P008",
-          "P004"
+          "P427",
+          "P080",
+          "P220"
         ],
         "expected_ids": [
           "P001",
           "P016",
           "P019"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.3333
+      },
+      {
+        "id": "Q006",
+        "query": "Looking for a special occasion evening dress under 500",
+        "predicted_ids": [
+          "P489",
+          "P488",
+          "P485",
+          "P486",
+          "P201"
+        ],
+        "expected_ids": [
+          "P485",
+          "P486",
+          "P488"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 1.0
+      },
+      {
+        "id": "Q007",
+        "query": "Need polished workwear for office commute around 150",
+        "predicted_ids": [
+          "P494",
+          "P499",
+          "P495",
+          "P040",
+          "P141"
+        ],
+        "expected_ids": [
+          "P493",
+          "P494",
+          "P496"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.3333
+      },
+      {
+        "id": "Q008",
+        "query": "Need one-size accessories for travel and special occasion",
+        "predicted_ids": [
+          "P312",
+          "P355",
+          "P337",
+          "P318",
+          "P320"
+        ],
+        "expected_ids": [
+          "P312",
+          "P313",
+          "P011"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.3333
+      },
+      {
+        "id": "Q009",
+        "query": "Want an elegant jumpsuit for events and travel under 320",
+        "predicted_ids": [
+          "P455",
+          "P449",
+          "P453",
+          "P448",
+          "P458"
+        ],
+        "expected_ids": [
+          "P448",
+          "P449",
+          "P450"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.6667
+      },
+      {
+        "id": "Q010",
+        "query": "Looking for vacation swimwear for warm weather around 130",
+        "predicted_ids": [
+          "P476",
+          "P481",
+          "P484",
+          "P479",
+          "P469"
+        ],
+        "expected_ids": [
+          "P475",
+          "P476",
+          "P477"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.3333
+      },
+      {
+        "id": "Q011",
+        "query": "Need activewear for gym and errands in warm weather",
+        "predicted_ids": [
+          "P424",
+          "P421",
+          "P429",
+          "P432",
+          "P435"
+        ],
+        "expected_ids": [
+          "P421",
+          "P424",
+          "P425"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.6667
+      },
+      {
+        "id": "Q012",
+        "query": "Need a premium tote or shoulder bag for office events",
+        "predicted_ids": [
+          "P346",
+          "P341",
+          "P350",
+          "P337",
+          "P340"
+        ],
+        "expected_ids": [
+          "P338",
+          "P341",
+          "P340"
         ],
         "hit_rate_at_k": 1.0,
         "relevance_at_k": 0.6667
@@ -94,54 +226,55 @@
   "hybrid": {
     "mode": "hybrid",
     "k": 5,
-    "avg_hit_rate_at_k": 0.8,
-    "avg_relevance_at_k": 0.6333,
+    "avg_hit_rate_at_k": 1.0,
+    "avg_relevance_at_k": 0.5347,
     "cases": [
       {
         "id": "Q001",
         "query": "Need a minimal office outfit for mild weather under 140",
         "predicted_ids": [
-          "P001",
-          "P005",
-          "P010",
-          "P008",
-          "P017"
+          "P169",
+          "P057",
+          "P165",
+          "P080",
+          "P202"
         ],
         "expected_ids": [
-          "P002",
-          "P006",
           "P010",
-          "P017"
+          "P493",
+          "P494",
+          "P057"
         ],
         "hit_rate_at_k": 1.0,
-        "relevance_at_k": 0.5
+        "relevance_at_k": 0.25
       },
       {
         "id": "Q002",
-        "query": "I want rainy commute outerwear for work under 150",
+        "query": "I want rainy commute outerwear for work under 180",
         "predicted_ids": [
-          "P006",
-          "P005",
-          "P010",
-          "P008",
-          "P017"
+          "P003",
+          "P238",
+          "P248",
+          "P244",
+          "P237"
         ],
         "expected_ids": [
           "P003",
-          "P015"
+          "P006",
+          "P495"
         ],
-        "hit_rate_at_k": 0.0,
-        "relevance_at_k": 0.0
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.3333
       },
       {
         "id": "Q003",
         "query": "Weekend travel casual layers for cold weather around 120",
         "predicted_ids": [
-          "P018",
-          "P009",
-          "P005",
+          "P050",
+          "P403",
+          "P433",
           "P007",
-          "P015"
+          "P208"
         ],
         "expected_ids": [
           "P009",
@@ -149,34 +282,165 @@
           "P007"
         ],
         "hit_rate_at_k": 1.0,
-        "relevance_at_k": 1.0
+        "relevance_at_k": 0.3333
       },
       {
         "id": "Q004",
         "query": "Need formal office shoes or boots for cool weather",
         "predicted_ids": [
-          "P020"
+          "P020",
+          "P292",
+          "P309",
+          "P288",
+          "P280"
         ],
         "expected_ids": [
-          "P020"
+          "P020",
+          "P274"
         ],
         "hit_rate_at_k": 1.0,
-        "relevance_at_k": 1.0
+        "relevance_at_k": 0.5
       },
       {
         "id": "Q005",
         "query": "Looking for breathable warm-weather tops for weekend trips",
         "predicted_ids": [
           "P001",
-          "P016",
-          "P007",
-          "P008",
-          "P004"
+          "P427",
+          "P174",
+          "P080",
+          "P220"
         ],
         "expected_ids": [
           "P001",
           "P016",
           "P019"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.3333
+      },
+      {
+        "id": "Q006",
+        "query": "Looking for a special occasion evening dress under 500",
+        "predicted_ids": [
+          "P489",
+          "P485",
+          "P488",
+          "P486",
+          "P451"
+        ],
+        "expected_ids": [
+          "P485",
+          "P486",
+          "P488"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 1.0
+      },
+      {
+        "id": "Q007",
+        "query": "Need polished workwear for office commute around 150",
+        "predicted_ids": [
+          "P494",
+          "P499",
+          "P495",
+          "P496",
+          "P493"
+        ],
+        "expected_ids": [
+          "P493",
+          "P494",
+          "P496"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 1.0
+      },
+      {
+        "id": "Q008",
+        "query": "Need one-size accessories for travel and special occasion",
+        "predicted_ids": [
+          "P312",
+          "P355",
+          "P337",
+          "P318",
+          "P320"
+        ],
+        "expected_ids": [
+          "P312",
+          "P313",
+          "P011"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.3333
+      },
+      {
+        "id": "Q009",
+        "query": "Want an elegant jumpsuit for events and travel under 320",
+        "predicted_ids": [
+          "P455",
+          "P449",
+          "P448",
+          "P453",
+          "P451"
+        ],
+        "expected_ids": [
+          "P448",
+          "P449",
+          "P450"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.6667
+      },
+      {
+        "id": "Q010",
+        "query": "Looking for vacation swimwear for warm weather around 130",
+        "predicted_ids": [
+          "P476",
+          "P481",
+          "P484",
+          "P479",
+          "P482"
+        ],
+        "expected_ids": [
+          "P475",
+          "P476",
+          "P477"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.3333
+      },
+      {
+        "id": "Q011",
+        "query": "Need activewear for gym and errands in warm weather",
+        "predicted_ids": [
+          "P421",
+          "P424",
+          "P435",
+          "P432",
+          "P429"
+        ],
+        "expected_ids": [
+          "P421",
+          "P424",
+          "P425"
+        ],
+        "hit_rate_at_k": 1.0,
+        "relevance_at_k": 0.6667
+      },
+      {
+        "id": "Q012",
+        "query": "Need a premium tote or shoulder bag for office events",
+        "predicted_ids": [
+          "P346",
+          "P350",
+          "P341",
+          "P337",
+          "P338"
+        ],
+        "expected_ids": [
+          "P338",
+          "P341",
+          "P340"
         ],
         "hit_rate_at_k": 1.0,
         "relevance_at_k": 0.6667

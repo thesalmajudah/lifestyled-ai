@@ -49,6 +49,38 @@ class ProductRetriever:
     def _split_tags(self, value: str) -> List[str]:
         return [tag.strip().lower() for tag in str(value).split("|") if tag.strip()]
 
+    def _query_intent_bonus(self, metadata: Dict[str, str], query: str) -> float:
+        query_tokens = set(query.lower().replace("-", " ").split())
+        bonus = 0.0
+
+        category_aliases = {
+            "top": {"top", "tops", "shirt", "blouse", "tank", "sweater", "knit", "tee"},
+            "bottom": {"bottom", "bottoms", "pants", "trouser", "trousers", "jean", "jeans", "skirt"},
+            "dress": {"dress", "dresses"},
+            "outerwear": {"outerwear", "jacket", "coat", "trench", "blazer"},
+            "footwear": {"shoe", "shoes", "boot", "boots", "sneaker", "sneakers", "heel", "heels", "sandals"},
+            "bag": {"bag", "bags", "tote", "shoulder", "crossbody"},
+            "accessory": {"accessory", "accessories", "scarf", "necklace", "sunglasses"},
+            "activewear": {"activewear", "gym", "training", "workout", "sport"},
+            "swimwear": {"swim", "swimwear", "bikini", "swimsuit", "beach"},
+            "jumpsuit": {"jumpsuit", "romper"},
+            "workwear": {"workwear", "office", "corporate", "formal"},
+            "occasionwear": {"occasion", "evening", "gown", "party"},
+            "knitwear": {"knitwear", "knit", "cardigan", "turtleneck", "sweater"},
+            "loungewear": {"lounge", "loungewear", "sleep", "home"},
+        }
+
+        category = str(metadata.get("category", "")).lower()
+        category_terms = category_aliases.get(category, {category})
+        if query_tokens.intersection(category_terms):
+            bonus += 0.06
+
+        title_tokens = set(str(metadata.get("title", "")).lower().replace("-", " ").split())
+        overlap = query_tokens.intersection(title_tokens)
+        bonus += min(0.06, 0.015 * len(overlap))
+
+        return bonus
+
     def _profile_match_score(self, metadata: Dict[str, str], profile: UserProfile) -> Tuple[float, List[str]]:
         score = 0.0
         reasons = []
@@ -131,11 +163,15 @@ class ProductRetriever:
             profile_score, reasons = self._profile_match_score(metadata, profile)
             v_score = vector_scores.get(product_id, 0.0)
             b_score = bm25_scores.get(product_id, 0.0)
+            q_bonus = self._query_intent_bonus(metadata, query)
 
             if retrieval_mode == "vector":
-                total_score = 0.7 * v_score + 0.3 * profile_score
+                total_score = 0.65 * v_score + 0.25 * profile_score + 0.10 * q_bonus
             else:
-                total_score = 0.5 * v_score + 0.2 * b_score + 0.3 * profile_score
+                total_score = 0.35 * v_score + 0.20 * b_score + 0.30 * profile_score + 0.15 * q_bonus
+
+            if q_bonus > 0:
+                reasons.append("query-intent match")
 
             ranked.append(
                 SearchResult(
