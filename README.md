@@ -67,7 +67,7 @@ Implemented so far:
 - Streamlit monitoring dashboard page with 5 core charts
 - uv-based dependency management configured
 
-In progress:
+Next improvements:
 
 - screenshot capture for reviewer walkthrough
 - optional cost chart and deployment bonus
@@ -85,7 +85,7 @@ In progress:
 - vector and hybrid search
 - profile-aware filtering/ranking
 
-3. MVP interface
+3. v1 interface
 - Streamlit recommendation UI
 - user profile controls
 - feedback logging
@@ -203,7 +203,7 @@ Columns:
 - description
 - stock_status
 
-This dataset is a clean seed subset for MVP development and evaluation.
+This dataset is an expanded benchmark set for validation and iterative optimization.
 
 ## Retrieval Flow
 
@@ -476,4 +476,4 @@ Notes:
 ## Notes
 
 - The Zoomcamp FAQ dataset used in coursework is not used in this project.
-- This is attempt-ready scaffolding and will be iterated with stronger evaluation, monitoring, and packaging.
+- This is a working baseline release with ongoing optimization in retrieval quality, monitoring depth, and packaging polish.
