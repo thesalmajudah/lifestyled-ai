@@ -1,7 +1,7 @@
 import json
+import html
 from pathlib import Path
 
-import altair as alt
 import pandas as pd
 import streamlit as st
 
@@ -51,48 +51,112 @@ st.markdown(
 def pink_line_chart(series: pd.Series, x_label: str, y_label: str) -> None:
     chart_df = series.reset_index()
     chart_df.columns = [x_label, y_label]
-    line = (
-        alt.Chart(chart_df)
-        .mark_line(color=PINK, strokeWidth=3)
-        .encode(
-            x=alt.X(f"{x_label}:T"),
-            y=alt.Y(f"{y_label}:Q"),
-            tooltip=[x_label, y_label],
-        )
-    )
+    records = []
+    for row in chart_df.to_dict(orient="records"):
+        x_val = row[x_label]
+        if hasattr(x_val, "isoformat"):
+            x_val = x_val.isoformat()
+        y_val = row[y_label]
+        if pd.isna(y_val):
+            continue
+        records.append({x_label: str(x_val), y_label: float(y_val)})
 
-    points = (
-        alt.Chart(chart_df)
-        .mark_circle(color=PINK, size=70)
-        .encode(
-            x=alt.X(f"{x_label}:T"),
-            y=alt.Y(f"{y_label}:Q"),
-            tooltip=[x_label, y_label],
-        )
-    )
+    if not records:
+        st.info(f"No data for {y_label} yet.")
+        return
 
-    chart = (line + points).properties(height=260).configure_range(category=[PINK])
-    st.altair_chart(chart, use_container_width=True)
+    spec = {
+        "height": 260,
+        "data": {"values": records},
+        "layer": [
+            {
+                "mark": {"type": "line", "color": PINK, "strokeWidth": 3},
+                "encoding": {
+                    "x": {"field": x_label, "type": "ordinal", "sort": None, "title": x_label},
+                    "y": {"field": y_label, "type": "quantitative", "title": y_label},
+                    "tooltip": [
+                        {"field": x_label, "type": "ordinal", "title": x_label},
+                        {"field": y_label, "type": "quantitative", "title": y_label},
+                    ],
+                },
+            },
+            {
+                "mark": {"type": "point", "color": PINK, "filled": True, "size": 80},
+                "encoding": {
+                    "x": {"field": x_label, "type": "ordinal", "sort": None},
+                    "y": {"field": y_label, "type": "quantitative"},
+                },
+            },
+        ],
+    }
+    st.vega_lite_chart(spec, use_container_width=True)
 
 
 def pink_bar_chart(series: pd.Series, x_label: str, y_label: str) -> None:
     chart_df = series.reset_index()
     chart_df.columns = [x_label, y_label]
-    chart = (
-        alt.Chart(chart_df)
-        .mark_bar(color=PINK, cornerRadiusTopLeft=6, cornerRadiusTopRight=6)
-        .encode(
-            x=alt.X(f"{x_label}:N", sort=None),
-            y=alt.Y(f"{y_label}:Q"),
-            tooltip=[x_label, y_label],
-        )
-        .properties(height=260)
-    )
-    st.altair_chart(chart, use_container_width=True)
+    records = []
+    for row in chart_df.to_dict(orient="records"):
+        y_val = row[y_label]
+        if pd.isna(y_val):
+            continue
+        records.append({x_label: str(row[x_label]), y_label: float(y_val)})
+
+    if not records:
+        st.info(f"No data for {y_label} yet.")
+        return
+
+    spec = {
+        "height": 260,
+        "data": {"values": records},
+        "mark": {"type": "bar", "color": PINK, "cornerRadiusTopLeft": 6, "cornerRadiusTopRight": 6},
+        "encoding": {
+            "x": {"field": x_label, "type": "ordinal", "sort": None, "title": x_label},
+            "y": {"field": y_label, "type": "quantitative", "title": y_label},
+            "tooltip": [
+                {"field": x_label, "type": "ordinal", "title": x_label},
+                {"field": y_label, "type": "quantitative", "title": y_label},
+            ],
+        },
+    }
+    st.vega_lite_chart(spec, use_container_width=True)
 
 st.markdown("<h1 class='monitor-title'>LifeStyled Monitoring Dashboard</h1>", unsafe_allow_html=True)
 st.markdown("<hr class='monitor-divider' />", unsafe_allow_html=True)
 st.caption("Operational and feedback metrics from request logs")
+
+
+def render_query_table(query_rows: list[dict]) -> None:
+        if not query_rows:
+                st.info("No query rows yet.")
+                return
+
+        header = """
+        <table style='width:100%; border-collapse:collapse; font-size:0.92rem;'>
+            <thead>
+                <tr style='background:#fff1f6;'>
+                    <th style='text-align:left; padding:8px; border:1px solid #f4d0dc;'>Time</th>
+                    <th style='text-align:left; padding:8px; border:1px solid #f4d0dc;'>Query</th>
+                    <th style='text-align:left; padding:8px; border:1px solid #f4d0dc;'>Mode</th>
+                    <th style='text-align:left; padding:8px; border:1px solid #f4d0dc;'>Feedback</th>
+                    <th style='text-align:left; padding:8px; border:1px solid #f4d0dc;'>Latency (ms)</th>
+                </tr>
+            </thead>
+            <tbody>
+        """
+        lines = [header]
+        for row in query_rows:
+                lines.append(
+                        "<tr>"
+                        f"<td style='padding:8px; border:1px solid #f8dce6;'>{html.escape(str(row['time']))}</td>"
+                        f"<td style='padding:8px; border:1px solid #f8dce6;'>{html.escape(str(row['query']))}</td>"
+                        f"<td style='padding:8px; border:1px solid #f8dce6;'>{html.escape(str(row['mode']))}</td>"
+                        f"<td style='padding:8px; border:1px solid #f8dce6;'>{html.escape(str(row['feedback']))}</td>"
+                        f"<td style='padding:8px; border:1px solid #f8dce6;'>{html.escape(str(row['latency_ms']))}</td>"
+                        "</tr>"
+                )
+        lines.append("</tbody></table>")
+        st.markdown("".join(lines), unsafe_allow_html=True)
 
 if not EVENT_LOG_PATH.exists():
     st.warning("No events found yet. Use the main app page and submit feedback first.")
@@ -132,19 +196,19 @@ col2.metric("Avg response time (ms)", round(float(df["response_time_ms"].mean())
 col3.metric("Avg feedback", round(float(df["feedback"].mean()), 2))
 col4.metric("Hybrid usage %", round(100 * float((df["retrieval_mode"] == "hybrid").mean()), 1))
 
-st.subheader("1) Requests over time")
+st.subheader("Requests over time")
 requests_over_time = df.groupby("hour").size().rename("requests")
 pink_line_chart(requests_over_time, "hour", "requests")
 
-st.subheader("2) Avg response time over time")
+st.subheader("Avg response time over time")
 latency_over_time = df.groupby("hour")["response_time_ms"].mean()
 pink_line_chart(latency_over_time, "hour", "response_time_ms")
 
-st.subheader("3) Feedback trend")
+st.subheader("Feedback trend")
 feedback_over_time = df.groupby("hour")["feedback"].mean()
 pink_line_chart(feedback_over_time, "hour", "feedback")
 
-st.subheader("4) Top categories requested")
+st.subheader("Top categories requested")
 cat_lookup = {}
 if CATALOG_PATH.exists():
     catalog_df = pd.read_csv(CATALOG_PATH)
@@ -166,7 +230,7 @@ if not cat_df.empty:
 else:
     st.info("No category-like counts yet.")
 
-st.subheader("5) Budget band distribution")
+st.subheader("Budget band distribution")
 budget_bins = pd.cut(
     df["budget_mid"],
     bins=[0, 50, 100, 150, 250, 400, 600, 9999],
@@ -181,4 +245,29 @@ if "prompt_variant" in df.columns:
     st.write("Prompt variant usage")
     pink_bar_chart(prompt_usage, "prompt_variant", "count")
 
-st.dataframe(df.tail(50), use_container_width=True)
+st.subheader("Table for queries")
+query_table_rows = []
+for row in rows[-100:]:
+    query_table_rows.append(
+        {
+            "time": pd.to_datetime(row.get("timestamp", 0), unit="s", errors="coerce"),
+            "query": row.get("query", ""),
+            "mode": row.get("retrieval_mode", ""),
+            "feedback": row.get("feedback", ""),
+            "latency_ms": row.get("response_time_ms", ""),
+        }
+    )
+
+query_table_rows = sorted(
+    query_table_rows,
+    key=lambda x: x["time"] if pd.notna(x["time"]) else pd.Timestamp.min,
+    reverse=True,
+)
+
+for row in query_table_rows:
+    if pd.notna(row["time"]):
+        row["time"] = row["time"].strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        row["time"] = "n/a"
+
+render_query_table(query_table_rows)
