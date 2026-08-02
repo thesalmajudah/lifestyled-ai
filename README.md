@@ -59,6 +59,7 @@ Implemented so far:
 	- hybrid retrieval (BM25 + vector)
 	- profile-aware scoring
 	- metadata filters (budget, size, stock)
+- optional agentic retrieval loop with bounded query rewriting and diversity reranking
 - Streamlit interface
 - feedback logging to JSONL
 - retrieval validation dataset and evaluation script
@@ -172,6 +173,7 @@ flowchart TD
 │       ├── __init__.py
 │       ├── config.py
 │       ├── explanations.py
+│       ├── agentic.py
 │       ├── ingestion.py
 │       ├── models.py
 │       └── retrieval.py
@@ -213,6 +215,7 @@ This dataset is an expanded benchmark set for validation and iterative optimizat
 4. At query time:
 	 - run vector retrieval
 	 - optionally run BM25 (hybrid mode)
+	 - optionally run agentic loop (retrieve -> rewrite once if weak -> diversity rerank)
 	 - apply hard filters (budget, size, stock)
 	 - compute profile match score
 	 - return top-k ranked items with reasons
@@ -249,6 +252,7 @@ Latest run summary (k=5):
 Current retrieval default:
 
 - Hybrid retrieval is the default and best-performing evaluated mode on the validation set.
+- Streamlit also includes an optional agentic retrieval loop toggle for bounded rewrite+rerank orchestration.
 
 ### LLM Evaluation
 
@@ -441,14 +445,14 @@ Add these images before final submission and link them here:
 Best-practice extras:
 
 - [x] Hybrid retrieval
-- [ ] Re-ranking
-- [ ] Query rewriting
+- [x] Re-ranking
+- [x] Query rewriting
 
 Best practices goals:
 
 - [x] Hybrid retrieval evaluated
-- [ ] Re-ranking iteration planned
-- [ ] Query rewriting iteration planned
+- [x] Re-ranking iteration implemented
+- [x] Query rewriting iteration implemented
 
 ### Prompt Variant Artifacts
 

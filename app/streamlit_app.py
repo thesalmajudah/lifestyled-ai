@@ -16,6 +16,7 @@ if str(SRC_DIR) not in sys.path:
 load_dotenv(ROOT_DIR / ".env")
 
 from lifestyled.config import EVENT_LOG_PATH
+from lifestyled.agentic import AgenticRecommender
 from lifestyled.explanations import generate_explanation
 from lifestyled.models import UserProfile
 from lifestyled.retrieval import ProductRetriever
@@ -181,6 +182,16 @@ if "last_prompt_variant" not in st.session_state:
     st.session_state.last_prompt_variant = "A"
 if "last_llm_enabled" not in st.session_state:
     st.session_state.last_llm_enabled = False
+if "last_agentic_enabled" not in st.session_state:
+    st.session_state.last_agentic_enabled = True
+if "last_agent_steps" not in st.session_state:
+    st.session_state.last_agent_steps = []
+if "last_agent_stop_reason" not in st.session_state:
+    st.session_state.last_agent_stop_reason = ""
+if "last_agent_quality" not in st.session_state:
+    st.session_state.last_agent_quality = None
+if "effective_query" not in st.session_state:
+    st.session_state.effective_query = ""
 
 with st.sidebar:
     st.header("Your Profile")
@@ -209,6 +220,7 @@ with st.sidebar:
 
 query = st.text_input("What are you shopping for today?", "I need an office outfit for mild weather under $140")
 mode = st.radio("Retrieval mode", ["hybrid", "vector"], horizontal=True)
+use_agentic_loop = st.checkbox("Use agentic retrieval loop (beta)", value=True)
 use_llm_explanations = st.checkbox("Use LLM explanations", value=False)
 if use_llm_explanations:
     prompt_variant = st.selectbox("Explanation prompt variant", ["A", "B"], index=0)
@@ -232,7 +244,20 @@ if st.button("Get Recommendations"):
         )
 
         start = time.perf_counter()
-        results = retriever.search(query=query, profile=profile, retrieval_mode=mode)
+        if use_agentic_loop:
+            orchestrator = AgenticRecommender(retriever)
+            run_result = orchestrator.run(query=query, profile=profile, retrieval_mode=mode, k=5)
+            results = run_result.results
+            st.session_state.last_agent_steps = run_result.steps_as_dicts()
+            st.session_state.last_agent_stop_reason = run_result.stop_reason
+            st.session_state.last_agent_quality = run_result.quality_score
+            st.session_state.effective_query = run_result.final_query
+        else:
+            results = retriever.search(query=query, profile=profile, retrieval_mode=mode)
+            st.session_state.last_agent_steps = []
+            st.session_state.last_agent_stop_reason = "direct_retrieval"
+            st.session_state.last_agent_quality = None
+            st.session_state.effective_query = query
         latency_ms = (time.perf_counter() - start) * 1000
 
         st.session_state.last_results = results
@@ -242,10 +267,21 @@ if st.button("Get Recommendations"):
         st.session_state.last_latency_ms = round(latency_ms, 2)
         st.session_state.last_prompt_variant = prompt_variant
         st.session_state.last_llm_enabled = use_llm_explanations
+        st.session_state.last_agentic_enabled = use_agentic_loop
 
 results = st.session_state.last_results
 profile = st.session_state.last_profile
 if results and profile:
+    if st.session_state.last_agentic_enabled:
+        st.caption(
+            "Agentic loop: "
+            f"stop_reason={st.session_state.last_agent_stop_reason}; "
+            f"quality={st.session_state.last_agent_quality}; "
+            f"effective_query={st.session_state.effective_query}"
+        )
+        with st.expander("Agent steps"):
+            st.json(st.session_state.last_agent_steps)
+
     allow_llm = st.session_state.last_llm_enabled and bool(os.getenv("GROQ_API_KEY", "").strip())
     if st.session_state.last_llm_enabled and not allow_llm:
         st.info("GROQ_API_KEY missing. Showing retrieval reasons only.")
@@ -292,6 +328,11 @@ if results and profile:
             "feedback": int(feedback),
             "prompt_variant": st.session_state.last_prompt_variant,
             "llm_explanations_enabled": st.session_state.last_llm_enabled,
+            "agentic_enabled": st.session_state.last_agentic_enabled,
+            "agentic_stop_reason": st.session_state.last_agent_stop_reason,
+            "agentic_quality": st.session_state.last_agent_quality,
+            "effective_query": st.session_state.effective_query,
+            "agent_steps": st.session_state.last_agent_steps,
         }
         with EVENT_LOG_PATH.open("a", encoding="utf-8") as f:
             f.write(json.dumps(event, ensure_ascii=True) + "\n")
