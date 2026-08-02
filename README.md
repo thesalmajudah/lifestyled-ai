@@ -26,13 +26,16 @@
 10. [Interface](#interface)
 11. [Monitoring](#monitoring)
 12. [Reproducibility](#reproducibility)
-13. [Reviewer Quickstart](#reviewer-quickstart)
-14. [Screenshots Checklist](#screenshots-checklist)
-15. [Technology Choices](#technology-choices)
-16. [Evaluation Criteria Mapping (Zoomcamp)](#evaluation-criteria-mapping-zoomcamp)
-17. [Rubric Checklist (Current)](#rubric-checklist-current)
-18. [Containerization](#containerization)
-19. [Notes](#notes)
+13. [Live Demo](#live-demo)
+14. [Demo Video](#demo-video)
+15. [Reviewer Quickstart](#reviewer-quickstart)
+16. [Demo Assets Checklist](#demo-assets-checklist)
+17. [Technology Choices](#technology-choices)
+18. [Evaluation Criteria Mapping (Zoomcamp)](#evaluation-criteria-mapping-zoomcamp)
+19. [Evaluation Criteria Checklist](#evaluation-criteria-checklist)
+20. [Rubric Checklist (Current)](#rubric-checklist-current)
+21. [Containerization](#containerization)
+22. [Notes](#notes)
 
 ## Problem Description
 
@@ -371,6 +374,32 @@ uv run python scripts/score_prompt_variants.py
 docker compose up --build
 ```
 
+## Live Demo
+
+Temporary live app URL (Codespaces port forwarding):
+
+- https://automatic-fiesta-9x69xv7g6qpcp5p6-8511.app.github.dev
+
+Notes:
+
+- This URL is live while the Codespace/session is running.
+- For a permanent public URL, deploy to Streamlit Community Cloud and place that link here.
+
+## Demo Video
+
+Recommended short walkthrough (60-120 seconds):
+
+1. Open app and show profile + query inputs.
+2. Run one recommendation query and scroll recommendations.
+3. Toggle agentic retrieval loop and show Agent steps trace.
+4. Submit feedback (+1/-1).
+5. Open Monitoring page and show the main charts.
+
+How to add video in README:
+
+- Upload an `.mp4` into GitHub (drag-and-drop in the online README editor), then link it here.
+- Suggested path/name: `assets/lifestyled-demo.mp4`
+
 ## Reviewer Quickstart
 
 1. Clone the repository and move into it.
@@ -398,10 +427,11 @@ uv run env PYTHONPATH=src python scripts/evaluate_prompt_variants.py
 uv run python scripts/score_prompt_variants.py
 ```
 
-## Screenshots Checklist
+## Demo Assets Checklist
 
-Add these images before final submission and link them here:
+Add these assets before final submission:
 
+- [ ] short demo video (60-120 seconds)
 - [ ] main recommendation page after query
 - [ ] recommendation cards with reasons
 - [ ] monitoring page with charts
@@ -429,6 +459,22 @@ Add these images before final submission and link them here:
 - Monitoring: event logging implemented, dashboard in progress
 - Containerization: implemented (Dockerfile + docker-compose)
 - Reproducibility: setup and run commands included
+
+## Evaluation Criteria Checklist
+
+For peer reviewers, here is where each criterion is demonstrated:
+
+| Criterion | Where |
+|---|---|
+| Problem description | Problem Description section in this README |
+| Retrieval flow | Retrieval Flow section, `src/lifestyled/retrieval.py`, `src/lifestyled/agentic.py` |
+| Retrieval evaluation | `scripts/evaluate_retrieval.py`, `reports/retrieval_eval.md`, `reports/retrieval_eval.json` |
+| LLM evaluation | `scripts/evaluate_prompt_variants.py`, `scripts/score_prompt_variants.py`, `reports/prompt_variant_scoring.md` |
+| Interface | `app/streamlit_app.py` |
+| Ingestion pipeline | `scripts/build_index.py`, `src/lifestyled/ingestion.py` |
+| Monitoring | `app/pages/01_monitoring.py`, event logging in `app/streamlit_app.py`, `logs/events.jsonl` |
+| Containerization | `Dockerfile`, `docker-compose.yml` |
+| Reproducibility | Reproducibility and Reviewer Quickstart sections, `.env.example`, pinned dependencies |
 
 ## Rubric Checklist (Current)
 
