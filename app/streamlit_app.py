@@ -4,6 +4,7 @@ from pathlib import Path
 import os
 
 import streamlit as st
+import streamlit.components.v1 as components
 from dotenv import load_dotenv
 from groq import Groq
 
@@ -254,6 +255,8 @@ if "last_match_advice" not in st.session_state:
     st.session_state.last_match_advice = ""
 if "last_match_advice_error" not in st.session_state:
     st.session_state.last_match_advice_error = ""
+if "scroll_to_top" not in st.session_state:
+    st.session_state.scroll_to_top = False
 
 if st.session_state.reset_requested:
     st.session_state.last_results = []
@@ -282,6 +285,7 @@ if st.session_state.reset_requested:
     st.session_state.last_no_match_advice_error = ""
     st.session_state.last_match_advice = ""
     st.session_state.last_match_advice_error = ""
+    st.session_state.scroll_to_top = False
     st.session_state.reset_requested = False
 
 landing_prompts = [
@@ -300,6 +304,21 @@ def safe_strip(value) -> str:
     if isinstance(value, str):
         return value.strip()
     return str(value).strip()
+
+
+def scroll_results_to_top() -> None:
+    components.html(
+        """
+        <script>
+        window.parent.scrollTo({ top: 0, behavior: "auto" });
+        const mainSection = window.parent.document.querySelector("section.main");
+        if (mainSection) {
+            mainSection.scrollTo({ top: 0, behavior: "auto" });
+        }
+        </script>
+        """,
+        height=0,
+    )
 
 
 def llm_advice_error_message(error_text: str, context: str) -> str:
@@ -546,9 +565,6 @@ if not results:
                     st.rerun()
 
 if results and profile:
-    if not profile.size:
-        st.caption("Size is optional. Select a size in the sidebar to filter results by fit availability.")
-
     if st.session_state.last_match_advice:
         st.markdown("### Stylist advice")
         st.caption("LLM-generated guidance based on your query, profile, and top matched items.")
@@ -633,7 +649,7 @@ elif st.session_state.last_query:
             st.code(st.session_state.last_no_match_advice_error)
 
 if results:
-    submitted_query = st.chat_input("What are you shopping for today?")
+    submitted_query = st.chat_input("Keep looking?")
     if submitted_query is not None:
         normalized_query = safe_strip(submitted_query)
         st.session_state.query_draft = normalized_query
@@ -643,6 +659,7 @@ if results:
 
 if st.session_state.trigger_search:
     st.session_state.trigger_search = False
+    st.session_state.scroll_to_top = True
     query_to_run = safe_strip(st.session_state.queued_query) or safe_strip(st.session_state.get("query_draft"))
     st.session_state.queued_query = ""
     run_recommendations(
@@ -652,3 +669,7 @@ if st.session_state.trigger_search:
         use_llm_explanations=DEFAULT_ITEM_EXPLANATIONS,
         prompt_variant=DEFAULT_PROMPT_VARIANT,
     )
+
+if st.session_state.scroll_to_top:
+    scroll_results_to_top()
+    st.session_state.scroll_to_top = False
