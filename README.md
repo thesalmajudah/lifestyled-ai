@@ -18,7 +18,7 @@
 
 1. [Problem Description](#problem-description)
 2. [Current Project Status](#current-project-status)
-3. [Demo Video](#demo-video)
+3. [Project Demo](#project-demo)
 4. [Step-by-Step Implementation Path](#step-by-step-implementation-path)
 5. [System Architecture & Workflow](#system-architecture--workflow)
 6. [Repository Structure](#repository-structure)
@@ -58,7 +58,7 @@ LifeStyled is a profile-aware fashion assistant that retrieves relevant products
 - Monitoring dashboard page with core charts and query table
 - Retrieval and prompt evaluation scripts
 
-## Demo Video
+## Project Demo 
 
 Watch the local project demo video:
 
