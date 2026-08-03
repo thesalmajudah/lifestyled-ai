@@ -60,8 +60,6 @@ LifeStyled is a profile-aware fashion assistant that retrieves relevant products
 
 ## Project Demo 
 
-Watch the local project demo video:
-
 ![LifeStyled AI demo](media/lifestyled.ai-gif.gif)
 
 Short walkthrough: profile setup, recommendation query, feedback logging, and monitoring dashboard review.
