@@ -233,9 +233,11 @@ LLM output evaluation status, from `reports/prompt_variant_scoring.md`:
 
 | Metric | Value |
 |---|---|
-| Scoring coverage | 0/40 |
-| Recommendation status | insufficient_data |
-| Next step | Fill `manual_scores` in `reports/prompt_variant_outputs.json` and rerun `scripts/score_prompt_variants.py`. |
+| Scoring coverage | 40/40 |
+| Prompt A overall | 4.4 |
+| Prompt B overall | 4.0 |
+| Recommendation status | A |
+| Rationale | Prompt A scored higher on relevance, groundedness, and personalization; Prompt B scored higher on clarity. |
 
 Run LLM evaluation locally:
 

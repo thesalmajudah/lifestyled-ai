@@ -7,20 +7,20 @@
     "prompt_b": "```json\n{\n  \"summary\": \"The Pencil Work Skirt is a suitable office outfit for mild weather within the budget.\",\n  \"reasons\": [\n    \"The product is within the budget of $40-$140.\",\n    \"The product matches the user's style preference for 'minimal'.\",\n    \"The product matches the user's lifestyle for 'office' and 'commute'.\"\n  ],\n  \"cautions\": [\n    \"The product's price is close to the budget maximum, leaving little room for additional items.\"\n  ]\n}\n```",
     "manual_scores": {
       "relevance": {
-        "A": null,
-        "B": null
+        "A": 5,
+        "B": 4
       },
       "groundedness": {
-        "A": null,
-        "B": null
+        "A": 5,
+        "B": 4
       },
       "personalization": {
-        "A": null,
-        "B": null
+        "A": 5,
+        "B": 4
       },
       "clarity": {
-        "A": null,
-        "B": null
+        "A": 4,
+        "B": 5
       }
     }
   },
@@ -32,20 +32,20 @@
     "prompt_b": "```json\n{\n  \"summary\": \"The Wool Blend Overcoat from Axis Studio is a suitable choice for a rainy commute to work.\",\n  \"reasons\": [\n    \"The product is within the budget of $150.\",\n    \"The product's style matches the user's preference for 'minimal'.\",\n    \"The product's lifestyle matches the user's commute and office activities.\"\n  ],\n  \"cautions\": [\n    \"The product's climate match for 'cool' weather may not fully align with the user's 'rainy' climate preference.\"\n  ]\n}\n```",
     "manual_scores": {
       "relevance": {
-        "A": null,
-        "B": null
+        "A": 4,
+        "B": 4
       },
       "groundedness": {
-        "A": null,
-        "B": null
+        "A": 4,
+        "B": 3
       },
       "personalization": {
-        "A": null,
-        "B": null
+        "A": 4,
+        "B": 4
       },
       "clarity": {
-        "A": null,
-        "B": null
+        "A": 4,
+        "B": 5
       }
     }
   },
@@ -57,20 +57,20 @@
     "prompt_b": "```json\n{\n  \"summary\": \"This cropped poplin shirt is a suitable casual layer for weekend travel in cold weather.\",\n  \"reasons\": [\n    \"It falls within the budget of $60-$130.\",\n    \"Its casual style matches the user's style preferences.\",\n    \"It is suitable for travel and weekend occasions.\"\n  ],\n  \"cautions\": [\n    \"The product's climate match is only mild, which may not perfectly align with the user's cold weather requirement.\"\n  ]\n}\n```",
     "manual_scores": {
       "relevance": {
-        "A": null,
-        "B": null
+        "A": 3,
+        "B": 3
       },
       "groundedness": {
-        "A": null,
-        "B": null
+        "A": 4,
+        "B": 3
       },
       "personalization": {
-        "A": null,
-        "B": null
+        "A": 4,
+        "B": 4
       },
       "clarity": {
-        "A": null,
-        "B": null
+        "A": 4,
+        "B": 5
       }
     }
   },
@@ -82,20 +82,20 @@
     "prompt_b": "```json\n{\n  \"summary\": \"The Block Heel Ankle Boot by Urban Form is a suitable choice for formal office shoes or boots in cool weather.\",\n  \"reasons\": [\n    \"It falls within the budget range of $80-$150.\",\n    \"Its style matches the user's preferences for classic and elegant.\",\n    \"It is suitable for office settings and aligns with the user's lifestyle.\"\n  ],\n  \"cautions\": [\n    \"The product's score is relatively low at 0.5353, indicating some potential drawbacks.\"\n  ]\n}\n```",
     "manual_scores": {
       "relevance": {
-        "A": null,
-        "B": null
+        "A": 5,
+        "B": 4
       },
       "groundedness": {
-        "A": null,
-        "B": null
+        "A": 5,
+        "B": 3
       },
       "personalization": {
-        "A": null,
-        "B": null
+        "A": 5,
+        "B": 4
       },
       "clarity": {
-        "A": null,
-        "B": null
+        "A": 4,
+        "B": 5
       }
     }
   },
@@ -107,20 +107,20 @@
     "prompt_b": "```json\n{\n  \"summary\": \"The Everyday Linen Shirt by North Thread is a suitable choice for breathable warm-weather tops for weekend trips.\",\n  \"reasons\": [\n    \"It falls within the budget range of $20-$90.\",\n    \"Its style matches the user's preferences for casual and minimal designs.\",\n    \"It is suitable for warm weather, making it a good choice for weekend trips.\"\n  ],\n  \"cautions\": [\n    \"The product's score of 0.5812 is not exceptionally high, indicating some potential drawbacks.\",\n    \"The product's price of $49.99 is at the higher end of the user's budget range.\"\n  ]\n}\n```",
     "manual_scores": {
       "relevance": {
-        "A": null,
-        "B": null
+        "A": 5,
+        "B": 4
       },
       "groundedness": {
-        "A": null,
-        "B": null
+        "A": 5,
+        "B": 3
       },
       "personalization": {
-        "A": null,
-        "B": null
+        "A": 5,
+        "B": 4
       },
       "clarity": {
-        "A": null,
-        "B": null
+        "A": 4,
+        "B": 5
       }
     }
   }
