@@ -5,6 +5,7 @@
 **An end-to-end production-style RAG application for personalized fashion recommendations based on user style, lifestyle, climate, budget, and occasion, with LLM stylist advice.**
 
 **Live App:** https://lifestyled-ai.streamlit.app
+
 Please be patient as it takes sometime for app to wake up :)
 
 [![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
