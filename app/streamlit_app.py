@@ -290,12 +290,6 @@ landing_prompts = [
     "Need polished workwear for office commute",
 ]
 
-
-def queue_search() -> None:
-    draft = safe_strip(st.session_state.get("query_draft"))
-    st.session_state.trigger_search = bool(draft)
-
-
 def clear_conversation() -> None:
     st.session_state.reset_requested = True
 
@@ -533,21 +527,16 @@ results = st.session_state.last_results
 profile = st.session_state.last_profile
 
 if not results:
-    st.markdown("<h2 class='shopping-title' style='text-align:center; margin-top: 1.8rem;'>What are you looking for today?</h2>", unsafe_allow_html=True)
     _, center_col, _ = st.columns([1, 1.6, 1])
     with center_col:
-        query_col, submit_col = st.columns([12, 1])
-        with query_col:
-            st.text_input("What are you looking for today?", key="query_draft", label_visibility="collapsed", on_change=queue_search)
-        with submit_col:
-            if st.button(
-                "↑",
-                key="submit_query_top",
-                help="Submit query",
-                disabled=not bool(safe_strip(st.session_state.get("query_draft"))),
-            ):
-                st.session_state.trigger_search = True
-                st.rerun()
+        submitted_query = st.chat_input("What are you looking for today?")
+        if submitted_query is not None:
+            normalized_query = safe_strip(submitted_query)
+            st.session_state.query_draft = normalized_query
+            st.session_state.queued_query = normalized_query
+            st.session_state.trigger_search = bool(normalized_query)
+            st.rerun()
+
         for idx, prompt in enumerate(landing_prompts):
             _, prompt_col, _ = st.columns([1, 2, 1])
             with prompt_col:
@@ -644,20 +633,13 @@ elif st.session_state.last_query:
             st.code(st.session_state.last_no_match_advice_error)
 
 if results:
-    st.divider()
-    st.markdown("### Continue searching")
-    query_col, submit_col = st.columns([12, 1])
-    with query_col:
-        st.text_input("What are you shopping for today?", key="query_draft", on_change=queue_search)
-    with submit_col:
-        if st.button(
-            "↑",
-            key="submit_query_bottom",
-            help="Submit query",
-            disabled=not bool(safe_strip(st.session_state.get("query_draft"))),
-        ):
-            st.session_state.trigger_search = True
-            st.rerun()
+    submitted_query = st.chat_input("What are you shopping for today?")
+    if submitted_query is not None:
+        normalized_query = safe_strip(submitted_query)
+        st.session_state.query_draft = normalized_query
+        st.session_state.queued_query = normalized_query
+        st.session_state.trigger_search = bool(normalized_query)
+        st.rerun()
 
 if st.session_state.trigger_search:
     st.session_state.trigger_search = False
