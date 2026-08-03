@@ -60,6 +60,16 @@ LifeStyled is a profile-aware fashion assistant that retrieves relevant products
 
 ## Demo Video
 
+Watch the local project demo video:
+
+<video controls width="960" src="media/lifestyled.ai.mp4">
+	Your browser does not support the video tag.
+</video>
+
+Short walkthrough: profile setup, recommendation query, feedback logging, and monitoring dashboard review.
+
+Direct file link: [media/lifestyled.ai.mp4](media/lifestyled.ai.mp4)
+
 Recommended short walkthrough (60-120 seconds):
 
 1. Open app and show profile + query inputs.
