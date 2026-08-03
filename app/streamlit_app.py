@@ -292,12 +292,20 @@ landing_prompts = [
 
 
 def queue_search() -> None:
-    draft = (st.session_state.get("query_draft") or "").strip()
+    draft = safe_strip(st.session_state.get("query_draft"))
     st.session_state.trigger_search = bool(draft)
 
 
 def clear_conversation() -> None:
     st.session_state.reset_requested = True
+
+
+def safe_strip(value) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value.strip()
+    return str(value).strip()
 
 
 def llm_advice_error_message(error_text: str, context: str) -> str:
@@ -330,7 +338,7 @@ def llm_advice_error_message(error_text: str, context: str) -> str:
 
 
 def generate_runtime_style_advice(query: str, profile: UserProfile, items=None) -> str:
-    api_key = os.getenv("GROQ_API_KEY", "").strip()
+    api_key = safe_strip(os.getenv("GROQ_API_KEY", ""))
     if not api_key:
         raise RuntimeError("GROQ_API_KEY is not set")
 
@@ -429,7 +437,7 @@ def run_recommendations(
     use_llm_explanations: bool,
     prompt_variant: str,
 ) -> None:
-    query_text = (query or "").strip()
+    query_text = safe_strip(query)
     if not query_text:
         st.warning("Please tell us what you are shopping for before running recommendations.")
         return
@@ -492,7 +500,7 @@ def run_recommendations(
         try:
             if generate_match_advice is not None:
                 st.session_state.last_match_advice = generate_match_advice(
-                    query=query,
+                    query=query_text,
                     profile=profile,
                     items=run_results,
                 )
@@ -536,7 +544,7 @@ if not results:
                 "↑",
                 key="submit_query_top",
                 help="Submit query",
-                disabled=not bool((st.session_state.get("query_draft") or "").strip()),
+                disabled=not bool(safe_strip(st.session_state.get("query_draft"))),
             ):
                 st.session_state.trigger_search = True
                 st.rerun()
@@ -564,7 +572,7 @@ if results and profile:
 
     allow_llm = (
         st.session_state.last_llm_enabled
-        and bool(os.getenv("GROQ_API_KEY", "").strip())
+        and bool(safe_strip(os.getenv("GROQ_API_KEY", "")))
         and generate_explanation is not None
     )
     if st.session_state.last_llm_enabled and not allow_llm:
@@ -646,14 +654,14 @@ if results:
             "↑",
             key="submit_query_bottom",
             help="Submit query",
-            disabled=not bool((st.session_state.get("query_draft") or "").strip()),
+            disabled=not bool(safe_strip(st.session_state.get("query_draft"))),
         ):
             st.session_state.trigger_search = True
             st.rerun()
 
 if st.session_state.trigger_search:
     st.session_state.trigger_search = False
-    query_to_run = st.session_state.queued_query or st.session_state.get("query_draft") or ""
+    query_to_run = safe_strip(st.session_state.queued_query) or safe_strip(st.session_state.get("query_draft"))
     st.session_state.queued_query = ""
     run_recommendations(
         query=query_to_run,
